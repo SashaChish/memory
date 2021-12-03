@@ -1,4 +1,5 @@
 import { Button } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 import { useEffect, useState } from 'react';
 
@@ -24,9 +25,17 @@ import {
 export const RegistrationPage = () => {
 	const [isValidForm, setValidForm] = useState(false);
 	const email = useInput('', { isEmpty: true, isEmail: true });
-	const fullName = useInput('', { isEmpty: true, minLength: 6, maxLength: 40 });
-	const password = useInput('', { isEmpty: true, minLength: 6, maxLength: 40 });
-	const username = useInput('', { isEmpty: true, maxLength: 25 });
+	const fullName = useInput('', { isEmpty: true, minLength: 6, maxLength: 50 });
+	const password = useInput('', {
+		isEmpty: true,
+		minLength: 6,
+		maxLength: 100,
+	});
+	const username = useInput('', {
+		isEmpty: true,
+		isUsername: true,
+		maxLength: 25,
+	});
 
 	useEffect(() => {
 		if (
@@ -41,6 +50,10 @@ export const RegistrationPage = () => {
 		}
 	}, [email, fullName, password, username]);
 
+	const onSumitHandler = (e) => {
+		e.preventDefault();
+	};
+
 	return (
 		<PageWrapper>
 			<ContentWrapper>
@@ -48,7 +61,7 @@ export const RegistrationPage = () => {
 					<MainBlock>
 						<Title>Memory</Title>
 						<FormWrapper>
-							<Form>
+							<Form onSubmit={onSumitHandler}>
 								<FormTitle>
 									Sign up to see photos and videos from your friends.
 								</FormTitle>
@@ -87,7 +100,7 @@ export const RegistrationPage = () => {
 					<SwitchLoginBlock>
 						<p>
 							Have an account?
-							<a href='/'>Log in</a>
+							<Link to='/login'>Log in</Link>
 						</p>
 					</SwitchLoginBlock>
 				</ContentContainer>
