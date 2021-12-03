@@ -1,4 +1,10 @@
-import { Button, TextField } from '@mui/material';
+import { Button } from '@mui/material';
+
+import { useEffect, useState } from 'react';
+
+import { useInput } from '../../hooks';
+
+import { Input } from '../../components/Input';
 
 import {
 	ContentContainer,
@@ -16,6 +22,25 @@ import {
 } from './RegistrationPage.style';
 
 export const RegistrationPage = () => {
+	const [isValidForm, setValidForm] = useState(false);
+	const email = useInput('', { isEmpty: true, isEmail: true });
+	const fullName = useInput('', { isEmpty: true, minLength: 6, maxLength: 40 });
+	const password = useInput('', { isEmpty: true, minLength: 6, maxLength: 40 });
+	const username = useInput('', { isEmpty: true, maxLength: 25 });
+
+	useEffect(() => {
+		if (
+			email.inputValid &&
+			fullName.inputValid &&
+			password.inputValid &&
+			username.inputValid
+		) {
+			setValidForm(true);
+		} else {
+			setValidForm(false);
+		}
+	}, [email, fullName, password, username]);
+
 	return (
 		<PageWrapper>
 			<ContentWrapper>
@@ -23,12 +48,7 @@ export const RegistrationPage = () => {
 					<MainBlock>
 						<Title>Memory</Title>
 						<FormWrapper>
-							<Form
-								onSubmit={(e) => {
-									e.preventDefault();
-									console.log(1);
-								}}
-							>
+							<Form>
 								<FormTitle>
 									Sign up to see photos and videos from your friends.
 								</FormTitle>
@@ -36,47 +56,23 @@ export const RegistrationPage = () => {
 									<Line />
 								</BlockWrapper>
 								<BlockWrapper>
-									<TextField
-										label='Email'
-										variant='filled'
-										size='small'
-										fullWidth
-									/>
+									<Input label='Email' input={email} />
 								</BlockWrapper>
 								<BlockWrapper>
-									<TextField
-										label='Full Name'
-										variant='filled'
-										size='small'
-										fullWidth
-									/>
+									<Input label='Full name' input={fullName} />
 								</BlockWrapper>
 								<BlockWrapper>
-									<TextField
-										label='Username'
-										variant='filled'
-										size='small'
-										fullWidth
-									/>
+									<Input label='Username' input={username} />
 								</BlockWrapper>
 								<BlockWrapper>
-									<TextField
-										label='Password'
-										variant='filled'
-										size='small'
-										fullWidth
-									/>
+									<Input label='Password' input={password} type='password' />
 								</BlockWrapper>
 								<BlockWrapper>
 									<Button
+										disabled={!isValidForm}
 										type='submit'
 										variant='contained'
 										fullWidth
-										sx={{
-											fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-                      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-                      sans-serif`,
-										}}
 									>
 										Sign up
 									</Button>

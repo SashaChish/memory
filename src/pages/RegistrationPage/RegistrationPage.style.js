@@ -102,6 +102,10 @@ export const FormTitle = styled.div`
 	font-weight: 600;
 	line-height: 20px;
 	color: ${color3};
+
+	@media (max-width: 450px) {
+		margin: 0 20px 10px;
+	}
 `;
 
 export const Line = styled.div`
