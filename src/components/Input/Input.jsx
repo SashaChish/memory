@@ -1,8 +1,22 @@
 import PropTypes from 'prop-types';
+import { useState } from 'react';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import {
+	FilledInput,
+	FormControl,
+	IconButton,
+	InputAdornment,
+} from '@mui/material';
 
-import { CustomTextField } from './Input.style';
+import { CustomInputLabel, CustomTextField } from './Input.style';
 
 export const Input = ({ input, label, type }) => {
+	const [showPassword, setShowPassword] = useState(false);
+
+	const handleClickShowPassword = () => {
+		setShowPassword(!showPassword);
+	};
+
 	const setMUIColor = () => {
 		if (!input.isDirty) return '';
 		if (input.inputValid) {
@@ -19,18 +33,45 @@ export const Input = ({ input, label, type }) => {
 	};
 
 	return (
-		<CustomTextField
-			onBlur={input.onBlur}
-			onChange={input.onChange}
-			value={input.value}
-			type={type}
-			label={label}
-			variant='filled'
-			size='small'
-			color={setMUIColor()}
-			customcolor={setCustomColor()}
-			fullWidth
-		/>
+		<>
+			{type !== 'password' ? (
+				<CustomTextField
+					onBlur={input.onBlur}
+					onChange={input.onChange}
+					value={input.value}
+					type={type}
+					label={label}
+					variant='filled'
+					size='small'
+					color={setMUIColor()}
+					customcolor={setCustomColor()}
+					fullWidth
+				/>
+			) : (
+				<FormControl variant='filled' color={setMUIColor()} fullWidth>
+					<CustomInputLabel
+						htmlFor='filled-password'
+						customcolor={setCustomColor()}
+					>
+						Password
+					</CustomInputLabel>
+					<FilledInput
+						id='filled-password'
+						type={showPassword ? 'text' : 'password'}
+						value={input.value}
+						onChange={input.onChange}
+						onBlur={input.onBlur}
+						endAdornment={
+							<InputAdornment position='end'>
+								<IconButton onClick={handleClickShowPassword} edge='end'>
+									{showPassword ? <VisibilityOff /> : <Visibility />}
+								</IconButton>
+							</InputAdornment>
+						}
+					/>
+				</FormControl>
+			)}
+		</>
 	);
 };
 
