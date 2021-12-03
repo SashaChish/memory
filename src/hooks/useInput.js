@@ -5,6 +5,7 @@ const useValidation = (value, validations) => {
 	const [minLengthError, setMinLengthError] = useState(false);
 	const [maxLengthError, setMaxLengthError] = useState(false);
 	const [emailError, setEmailError] = useState(false);
+	const [usernameError, setUsernameError] = useState(false);
 	const [inputValid, setInputValid] = useState(false);
 
 	useEffect(() => {
@@ -23,11 +24,19 @@ const useValidation = (value, validations) => {
 				case 'isEmpty':
 					setEmpty(value ? false : true);
 					break;
-				case 'isEmail':
+				case 'isEmail': {
 					const reg =
 						/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,4}))$/;
 					setEmailError(!reg.test(value));
 					break;
+				}
+				case 'isUsername': {
+					const reg =
+						/^(?=.{1,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/;
+					setUsernameError(!reg.test(value));
+					break;
+				}
+
 				default:
 					return;
 			}
@@ -35,12 +44,18 @@ const useValidation = (value, validations) => {
 	}, [value, validations]);
 
 	useEffect(() => {
-		if (isEmpty || minLengthError || maxLengthError || emailError) {
+		if (
+			isEmpty ||
+			minLengthError ||
+			maxLengthError ||
+			emailError ||
+			usernameError
+		) {
 			setInputValid(false);
 		} else {
 			setInputValid(true);
 		}
-	}, [isEmpty, minLengthError, maxLengthError, emailError]);
+	}, [isEmpty, minLengthError, maxLengthError, emailError, usernameError]);
 
 	return {
 		inputValid,
