@@ -10,7 +10,7 @@ import {
 
 import { CustomInputLabel, CustomTextField } from './Input.style';
 
-export const Input = ({ input, label, type }) => {
+export const Input = ({ input, label, type, error }) => {
 	const [showPassword, setShowPassword] = useState(false);
 
 	const handleClickShowPassword = () => {
@@ -19,7 +19,7 @@ export const Input = ({ input, label, type }) => {
 
 	const setMUIColor = () => {
 		if (!input.isDirty) return '';
-		if (input.inputValid) {
+		if (input.inputValid && !error) {
 			return 'success';
 		}
 		return 'error';
@@ -27,7 +27,7 @@ export const Input = ({ input, label, type }) => {
 
 	const setCustomColor = () => {
 		if (!input.isDirty) return '#2b2b2b';
-		if (input.isDirty && !input.inputValid) return '#ff1744';
+		if ((input.isDirty && !input.inputValid) || error) return '#ff1744';
 		if (input.isDirty && input.inputValid) return '#00a152';
 		return '#3d5afe';
 	};

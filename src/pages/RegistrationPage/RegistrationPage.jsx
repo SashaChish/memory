@@ -1,9 +1,9 @@
 import { Button } from '@mui/material';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { useEffect, useState } from 'react';
 
+import { registration } from '../../services';
 import { useInput } from '../../hooks';
 
 import { Input } from '../../components/Input';
@@ -25,6 +25,9 @@ import {
 
 export const RegistrationPage = () => {
 	const [isValidForm, setValidForm] = useState(false);
+	const [isExistEmail, setExistEmail] = useState(false);
+	const [isExistUsername, setExistUsername] = useState(false);
+	const [errorMessage, setErrorMessage] = useState('');
 	const email = useInput('', { isEmpty: true, isEmail: true });
 	const fullName = useInput('', { isEmpty: true, minLength: 6, maxLength: 50 });
 	const password = useInput('', {
@@ -37,6 +40,7 @@ export const RegistrationPage = () => {
 		isUsername: true,
 		maxLength: 25,
 	});
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (
@@ -54,17 +58,25 @@ export const RegistrationPage = () => {
 	const onSumitHandler = (e) => {
 		e.preventDefault();
 
-		// 	axios({
-		// 		method: 'post',
-		// 		url: 'http://localhost:5000/api/auth',
-		// 		headers: {
-		// 			'x-auth-token': '',
-		// 		},
-		// 		data: {
-		// 			email: email.value,
-		// 			password: password.value,
-		// 		},
-		// 	}).then((data) => console.log(data));
+		registration({
+			email: email.value,
+			password: password.value,
+			fullName: fullName.value,
+			username: username.value,
+		})
+			.then((res) => {
+				localStorage.setItem('x-auth-token', res.data.token);
+				navigate('/home');
+			})
+			.catch((e) => {
+				if (e.toJSON().status === 409) {
+					const { field, errors } = e.response.data;
+
+					setExistEmail(field === 'email' ? true : false);
+					setExistUsername(field === 'username' ? true : false);
+					setErrorMessage(errors);
+				}
+			});
 	};
 
 	return (
@@ -81,14 +93,21 @@ export const RegistrationPage = () => {
 								<BlockWrapper>
 									<Line />
 								</BlockWrapper>
+								{(isExistEmail || isExistUsername) && (
+									<BlockWrapper color={'#ff1744'}>{errorMessage}</BlockWrapper>
+								)}
 								<BlockWrapper>
-									<Input label='Email' input={email} />
+									<Input error={isExistEmail} label='Email' input={email} />
 								</BlockWrapper>
 								<BlockWrapper>
 									<Input label='Full name' input={fullName} />
 								</BlockWrapper>
 								<BlockWrapper>
-									<Input label='Username' input={username} />
+									<Input
+										error={isExistUsername}
+										label='Username'
+										input={username}
+									/>
 								</BlockWrapper>
 								<BlockWrapper>
 									<Input label='Password' input={password} type='password' />
