@@ -2,6 +2,7 @@ import { Button, TextField, InputAdornment, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material/.';
 import { useState } from 'react';
 import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 
 import {
 	ContentContainer,
@@ -22,30 +23,29 @@ export const LogPage = () => {
 	const togglePassword = () => {
 		setPasswordShown(!passwordShown);
 	};
+	const navigate = useNavigate();
 
 	function submitForm(e) {
-		if (
-			/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-				e.target.email.value
-			) &&
-			e.target.password.value.length > 4
-		) {
+		e.preventDefault();
+
+		const reg =
+			/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+		if (reg.test(e.target.email.value) && e.target.password.value.length > 4) {
 			setError('');
-			e.preventDefault();
 			axios({
 				method: 'post',
 				url: 'http://localhost:5000/api/auth',
-				headers: {
-					'x-auth-token': '',
-				},
 				data: {
 					email: e.target.email.value,
 					password: e.target.password.value,
 				},
-			}).then((data) => console.log(data));
+			}).then((data) => {
+				localStorage.setItem('x-auth-token', data.data.token);
+				navigate('/username');
+			});
 		} else {
 			setError('error');
-			e.preventDefault();
 		}
 	}
 
@@ -110,7 +110,7 @@ export const LogPage = () => {
 					<SwitchLoginBlock>
 						<p>
 							Don't have an account?
-							<a href='/'>Sign up</a>
+							<Link to='/registration'>Sign up</Link>
 						</p>
 					</SwitchLoginBlock>
 				</ContentContainer>
