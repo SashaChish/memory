@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {check, validationResult} = require('express-validator');
 const auth = require('../../middleware/auth.js');
+const request = require('request');
 
 const Post = require('../../models/Post.js');
 const User = require('../../models/User.js');
@@ -42,8 +43,9 @@ router.post('/', [auth, [
 //@access   Private
 router.get("/", auth, async (req,res) => {
     try{
-        const posts = await Post.find().sort({date: -1});
-        res.json(posts);
+        const posts = await Post.find().select('-saved').sort({date: -1}).lean();
+        const postsFinally = posts.map(post => ({...post, saved: post.user.toString() === req.user.id ? true : false}));
+        res.json(postsFinally);
     }catch(err){
         console.error(err.message);
         res.status(500).send('Server Error!');
@@ -67,13 +69,11 @@ router.get("/profile/:username", auth, async (req,res) => {
 //@route    GET api/posts/saved/:username
 //@desc     Get all saved posts related to specific username
 //@access   Private
-router.get('/saved/:username', auth, async (req,res) => {
+router.get('/saved/me', auth, async (req,res) => {
     try{
-        const posts = await Post.find({username: req.params.username}).sort({date: -1});
-
-        const savedPosts = posts.filter(post => post.saved.some(saveElem => saveElem.user.toString() === req.user.id));
-        
-        res.json(savedPosts);
+        const posts = await Post.find().select('-saved').sort({date: -1}).lean();
+        const postsFinally = posts.map(post => ({...post, saved: post.user.toString() === req.user.id ? true : false})).filter(post => post.saved);
+        res.json(postsFinally);
     }catch(err){
         console.error(err.message);
         res.status(500).send('Server Error!');
@@ -85,13 +85,15 @@ router.get('/saved/:username', auth, async (req,res) => {
 //@access   Private
 router.get('/:id', auth, async (req,res) => {
     try{
-        const post = await Post.findById(req.params.id);
+        const post = await Post.findById(req.params.id).select('-saved').lean();
 
         if(!post){
             return res.status(404).json({msg: 'Post not found!'});
         }
 
-        res.json(post);
+        const postFinally = {...post, saved: post.user.toString() === req.user.id ? true : false}
+
+        res.json(postFinally);
     }catch(err){
         console.error(err.message);
         if(err.kind === "ObjectId"){
@@ -106,6 +108,7 @@ router.get('/:id', auth, async (req,res) => {
 //@access   Private
 router.delete('/:id', auth, async (req,res) => {
     try{
+        const user = await User.findById(req.user.id);
         const post = await Post.findById(req.params.id);
 
         if(!post){
@@ -117,6 +120,10 @@ router.delete('/:id', auth, async (req,res) => {
         }
 
         await post.remove();
+
+        user.saved = user.saved.filter(savedElem => savedElem.post.toString() !== req.params.id);
+
+        await user.save();
 
         res.json({msg: "Post removed"});
     }catch(err){
@@ -189,7 +196,7 @@ router.put('/save/:id', auth, async (req,res) => {
 
         await post.save();
 
-        res.json(post);
+        res.json({msg: 'Post saved!'});
     }catch(err){
         console.error(err.message);
         res.status(500).send('Server Error!');
@@ -213,7 +220,7 @@ router.put('/unsave/:id', auth, async (req,res) => {
 
         await post.save();
 
-        res.json(post);
+        res.json({msg: 'Post unsaved!'});
     }catch(err){
         console.error(err.message);
         res.status(500).send('Server Error!');
