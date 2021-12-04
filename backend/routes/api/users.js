@@ -30,13 +30,24 @@ router.post(
 		const { fullName, email, password, username } = req.body;
 
 		try {
-			let user = User.findOne({ email: email });
+			const userEmail = await User.findOne({ email: email });
+			const userName = await User.findOne({ username: username });
 
-			if (!user) {
-				return res.status(400).json({ errors: 'User already exists!' });
+			if (userEmail) {
+				return res.status(409).send({
+					errors: 'Email already exists!',
+					field: 'email',
+				});
 			}
 
-			user = new User({
+			if (userName) {
+				return res.status(409).send({
+					errors: 'Username already exists!',
+					field: 'username',
+				});
+			}
+
+			const user = new User({
 				fullName,
 				email,
 				password,

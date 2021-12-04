@@ -118,6 +118,7 @@ export const Line = styled.div`
 export const BlockWrapper = styled.div`
 	width: 100%;
 	padding: 0px 40px 15px;
+	color: ${({ color }) => color || '#000000'};
 
 	@media (max-width: 450px) {
 		padding: 0px 20px 15px;
