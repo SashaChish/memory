@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const {check, validationResult} = require('express-validator');
 const auth = require('../../middleware/auth.js');
-const request = require('request');
 
 const Post = require('../../models/Post.js');
 const User = require('../../models/User.js');
+const Profile = require('../../models/Profile.js');
 
 //@route    POST api/posts
 //@desc     Create a post
@@ -21,6 +21,7 @@ router.post('/', [auth, [
 
     try{
         const user = await User.findById(req.user.id);
+        const profile = await Profile.findOne({user: req.user.id});
 
         const newPost = new Post({
             user: req.user.id,
@@ -30,8 +31,11 @@ router.post('/', [auth, [
             avatar: user.avatar
         });
 
-        const post = await newPost.save();
-        res.json(post);
+        await newPost.save(function(err, room){
+            profile.posts.unshift({post: room.id});
+            profile.save();
+        });
+        res.json(newPost);
     }catch(err){
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -43,55 +47,27 @@ router.post('/', [auth, [
 //@access   Private
 router.get("/", auth, async (req,res) => {
     try{
-        const posts = await Post.find().select('-saved').sort({date: -1}).lean();
-        const postsFinally = posts.map(post => ({...post, saved: post.user.toString() === req.user.id ? true : false}));
+        const posts = await Post.find().sort({date: -1}).lean();
+        const postsFinally = posts.map(post => ({...post, saved: post.saved.some(elem => elem.user.toString() === req.user.id)}));
         res.json(postsFinally);
     }catch(err){
         console.error(err.message);
         res.status(500).send('Server Error!');
     }
 })
-
-//@route    GET api/posts/profile/:username
-//@desc     Get all posts published by specific username
-//@access   Private
-router.get("/profile/:username", auth, async (req,res) => {
-    try{
-        const profilePosts = await Post.find({username: req.params.username}).sort({date: -1});
-
-        res.json(profilePosts);
-    }catch(err){
-        console.error(err.message);
-        res.status(500).send('Server Error!');
-    }
-})
-
-//@route    GET api/posts/saved/:username
-//@desc     Get all saved posts related to specific username
-//@access   Private
-router.get('/saved/me', auth, async (req,res) => {
-    try{
-        const posts = await Post.find().select('-saved').sort({date: -1}).lean();
-        const postsFinally = posts.map(post => ({...post, saved: post.user.toString() === req.user.id ? true : false})).filter(post => post.saved);
-        res.json(postsFinally);
-    }catch(err){
-        console.error(err.message);
-        res.status(500).send('Server Error!');
-    }
-});
 
 //@route    GET api/posts/:id
 //@desc     Get post by ID
 //@access   Private
 router.get('/:id', auth, async (req,res) => {
     try{
-        const post = await Post.findById(req.params.id).select('-saved').lean();
+        const post = await Post.findById(req.params.id).lean();
 
         if(!post){
             return res.status(404).json({msg: 'Post not found!'});
         }
 
-        const postFinally = {...post, saved: post.user.toString() === req.user.id ? true : false}
+        const postFinally = {...post, saved: post.saved.some(elem => elem.user.toString() === req.user.id)}
 
         res.json(postFinally);
     }catch(err){
@@ -110,6 +86,7 @@ router.delete('/:id', auth, async (req,res) => {
     try{
         const user = await User.findById(req.user.id);
         const post = await Post.findById(req.params.id);
+        const profile = await Profile.findOne({user: req.user.id});
 
         if(!post){
             return res.status(404).json({msg: 'Post not found!'});
@@ -124,6 +101,10 @@ router.delete('/:id', auth, async (req,res) => {
         user.saved = user.saved.filter(savedElem => savedElem.post.toString() !== req.params.id);
 
         await user.save();
+
+        profile.posts = profile.posts.filter(postElem => postElem.post.toString() !== req.params.id);
+
+        await profile.save();
 
         res.json({msg: "Post removed"});
     }catch(err){
@@ -187,14 +168,17 @@ router.put('/unlike/:id', auth, async (req,res) => {
 router.put('/save/:id', auth, async (req,res) => {
     try{
         const post = await Post.findById(req.params.id);
+        const profile = await Profile.findOne({user: req.user.id});
 
         if(post.saved.filter(saveElem => saveElem.user.toString() === req.user.id).length > 0){
             return res.status(400).json({msg: 'Post already saved!'});
         }
 
         post.saved.unshift({user: req.user.id});
+        profile.saved.unshift({post: req.params.id});
 
         await post.save();
+        await profile.save();
 
         res.json({msg: 'Post saved!'});
     }catch(err){
@@ -209,16 +193,20 @@ router.put('/save/:id', auth, async (req,res) => {
 router.put('/unsave/:id', auth, async (req,res) => {
     try{
         const post = await Post.findById(req.params.id);
+        const profile = await Profile.findOne({user: req.user.id});
 
         if(post.saved.filter(saveElem => saveElem.user.toString() === req.user.id).length === 0){
             res.status(400).json({msg: 'Post has not yet been saved!'});
         }
 
         const removeIndex = post.saved.map(saveElem => saveElem.user.toString()).indexOf(req.user.id);
+        const profileRemoveIndex = profile.saved.map(saveElem => saveElem.post.toString()).indexOf(req.params.id);
 
         post.saved.splice(removeIndex, 1);
+        profile.saved.splice(profileRemoveIndex, 1);
 
         await post.save();
+        await profile.save();
 
         res.json({msg: 'Post unsaved!'});
     }catch(err){

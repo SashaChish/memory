@@ -6,6 +6,7 @@ const config = require('config');
 const { check, validationResult } = require('express-validator');
 
 const User = require('../../models/User.js');
+const Profile = require('../../models/Profile.js');
 
 //@route    Post api/users
 //@desc     Register user
@@ -57,7 +58,15 @@ router.post(
 			const salt = await bcrypt.genSalt(10);
 			user.password = await bcrypt.hash(password, salt);
 
-			await user.save();
+			await user.save(function(err, room){
+				const profile = new Profile({
+					user: room.id,
+					avatar: room.avatar,
+					username: username
+				})
+
+				profile.save();
+			});
 
 			const payload = {
 				user: {
