@@ -7,14 +7,24 @@ const bcrypt = require('bcryptjs');
 const { check, validationResult } = require('express-validator');
 
 const User = require('../../models/User.js');
+const Profile = require('../../models/Profile.js');
 
 //@route    GET api/auth
 //@desc     Test route
 //@access   Public
 router.get('/', auth, async (req, res) => {
 	try {
-		const user = await User.findById(req.user.id).select('-password');
-		res.json(user);
+		const user = await User.findById(req.user.id).select('-password').lean();
+		const profile = await Profile.findOne({user: req.user.id}).lean();
+		const finalResponse = {
+			...user,
+			posts: profile.posts,
+			followers: profile.followers,
+			following: profile.following,
+			saved: profile.saved
+		}
+
+		res.json(finalResponse);
 	} catch (err) {
 		console.log(err.message);
 		res.status(500).send('Server Error');

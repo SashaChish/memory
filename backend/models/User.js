@@ -22,15 +22,7 @@ const UserSchema = new mongoose.Schema({
     avatar: {
         type:String,
         default: 'https://nogivruki.ua/wp-content/uploads/2018/08/default-user-image.png'
-    },
-    saved: [
-        {
-            post: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'post'
-            }
-        }
-    ]
+    }
 });
 //збережені пости, пости, підписки, лайки, коменти, date
 module.exports = User = mongoose.model("user", UserSchema);
