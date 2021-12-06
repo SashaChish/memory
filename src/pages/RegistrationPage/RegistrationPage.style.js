@@ -2,21 +2,13 @@ import styled from 'styled-components';
 
 import { color1, color2, color3, color4 } from '../../theme/colors';
 
-export const PageWrapper = styled.div`
-	width: 100%;
-	min-height: 100vh;
-	background: ${color1};
-	display: flex;
-	align-items: center;
-	justify-content: center;
-`;
-
 export const ContentWrapper = styled.div`
 	min-height: 100%;
 	padding: 15px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex: 1 1 auto;
 `;
 
 export const ContentContainer = styled.div`
@@ -25,6 +17,7 @@ export const ContentContainer = styled.div`
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
+	flex-grow: 1;
 `;
 
 export const MainBlock = styled.div`

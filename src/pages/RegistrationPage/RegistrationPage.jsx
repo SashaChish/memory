@@ -9,6 +9,10 @@ import { useInput } from '../../hooks';
 import { Input } from '../../components/Input';
 
 import {
+	Main,
+	PageWrapper,
+} from '../../theme/GlobalComponents/GlobalComponents.style';
+import {
 	ContentContainer,
 	ContentWrapper,
 	Form,
@@ -16,7 +20,6 @@ import {
 	FormWrapper,
 	Line,
 	MainBlock,
-	PageWrapper,
 	SwitchLoginBlock,
 	Title,
 	BlockWrapper,
@@ -55,88 +58,93 @@ export const RegistrationPage = () => {
 		}
 	}, [email, fullName, password, username]);
 
-	const onSumitHandler = (e) => {
+	const onSumitHandler = async (e) => {
 		e.preventDefault();
 
-		registration({
-			email: email.value,
-			password: password.value,
-			fullName: fullName.value,
-			username: username.value,
-		})
-			.then((res) => {
-				localStorage.setItem('x-auth-token', res.data.token);
-				navigate('/home');
-			})
-			.catch((e) => {
-				if (e.toJSON().status === 409) {
-					const { field, errors } = e.response.data;
-
-					setExistEmail(field === 'email' ? true : false);
-					setExistUsername(field === 'username' ? true : false);
-					setErrorMessage(errors);
-				}
+		try {
+			const res = await registration({
+				email: email.value,
+				password: password.value,
+				fullName: fullName.value,
+				username: username.value,
 			});
+
+			localStorage.setItem('x-auth-token', res.data.token);
+			navigate(`/${username.value}`);
+		} catch (e) {
+			console.log(e);
+			if (e.toJSON().status === 409) {
+				const { field, errors } = e.response.data;
+
+				setExistEmail(field === 'email' ? true : false);
+				setExistUsername(field === 'username' ? true : false);
+				setErrorMessage(errors);
+			}
+		}
 	};
 
 	return (
 		<PageWrapper>
-			<ContentWrapper>
-				<ContentContainer>
-					<MainBlock>
-						<Title>Memory</Title>
-						<FormWrapper>
-							<Form onSubmit={onSumitHandler}>
-								<FormTitle>
-									Sign up to see photos and videos from your friends.
-								</FormTitle>
-								<BlockWrapper>
-									<Line />
-								</BlockWrapper>
-								{(isExistEmail || isExistUsername) && (
-									<BlockWrapper color={'#ff1744'}>{errorMessage}</BlockWrapper>
-								)}
-								<BlockWrapper>
-									<Input error={isExistEmail} label='Email' input={email} />
-								</BlockWrapper>
-								<BlockWrapper>
-									<Input label='Full name' input={fullName} />
-								</BlockWrapper>
-								<BlockWrapper>
-									<Input
-										error={isExistUsername}
-										label='Username'
-										input={username}
-									/>
-								</BlockWrapper>
-								<BlockWrapper>
-									<Input label='Password' input={password} type='password' />
-								</BlockWrapper>
-								<BlockWrapper>
-									<Button
-										disabled={!isValidForm}
-										type='submit'
-										variant='contained'
-										fullWidth
-									>
-										Sign up
-									</Button>
-								</BlockWrapper>
-								<AgreementText>
-									By signing up, you agree to our Terms, Date, Policy and
-									Cookies Policy.
-								</AgreementText>
-							</Form>
-						</FormWrapper>
-					</MainBlock>
-					<SwitchLoginBlock>
-						<p>
-							Have an account?
-							<Link to='/login'>Log in</Link>
-						</p>
-					</SwitchLoginBlock>
-				</ContentContainer>
-			</ContentWrapper>
+			<Main>
+				<ContentWrapper>
+					<ContentContainer>
+						<MainBlock>
+							<Title>Memory</Title>
+							<FormWrapper>
+								<Form onSubmit={onSumitHandler}>
+									<FormTitle>
+										Sign up to see photos and videos from your friends.
+									</FormTitle>
+									<BlockWrapper>
+										<Line />
+									</BlockWrapper>
+									{(isExistEmail || isExistUsername) && (
+										<BlockWrapper color={'#ff1744'}>
+											{errorMessage}
+										</BlockWrapper>
+									)}
+									<BlockWrapper>
+										<Input error={isExistEmail} label='Email' input={email} />
+									</BlockWrapper>
+									<BlockWrapper>
+										<Input label='Full name' input={fullName} />
+									</BlockWrapper>
+									<BlockWrapper>
+										<Input
+											error={isExistUsername}
+											label='Username'
+											input={username}
+										/>
+									</BlockWrapper>
+									<BlockWrapper>
+										<Input label='Password' input={password} type='password' />
+									</BlockWrapper>
+									<BlockWrapper>
+										<Button
+											disabled={!isValidForm}
+											type='submit'
+											variant='contained'
+											fullWidth
+										>
+											Sign up
+										</Button>
+									</BlockWrapper>
+									<AgreementText>
+										By signing up, you agree to our Terms, Date, Policy and
+										Cookies Policy.
+									</AgreementText>
+								</Form>
+							</FormWrapper>
+						</MainBlock>
+						<SwitchLoginBlock>
+							<p>
+								Have an account?
+								<Link to='/login'>Log in</Link>
+							</p>
+						</SwitchLoginBlock>
+					</ContentContainer>
+				</ContentWrapper>
+			</Main>
 		</PageWrapper>
 	);
 };

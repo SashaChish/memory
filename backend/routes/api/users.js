@@ -58,12 +58,12 @@ router.post(
 			const salt = await bcrypt.genSalt(10);
 			user.password = await bcrypt.hash(password, salt);
 
-			await user.save(function(err, room){
+			await user.save(function (err, room) {
 				const profile = new Profile({
 					user: room.id,
 					avatar: room.avatar,
-					username: username
-				})
+					username: username,
+				});
 
 				profile.save();
 			});
