@@ -9,6 +9,7 @@ export default function App() {
 				<Route path='/registration' element={<RegistrationPage />} />
 				<Route exact path='/login' element={<LogPage />} />
 				<Route path='/:username/*' element={<UserPage />} />
+				<Route exact path='/profile' />
 			</Routes>
 		</Router>
 	);
