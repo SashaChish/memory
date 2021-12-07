@@ -15,14 +15,14 @@ const Profile = require('../../models/Profile.js');
 router.get('/', auth, async (req, res) => {
 	try {
 		const user = await User.findById(req.user.id).select('-password').lean();
-		const profile = await Profile.findOne({user: req.user.id}).lean();
+		const profile = await Profile.findOne({ user: req.user.id }).lean();
 		const finalResponse = {
 			...user,
 			posts: profile.posts,
 			followers: profile.followers,
 			following: profile.following,
-			saved: profile.saved
-		}
+			saved: profile.saved,
+		};
 
 		res.json(finalResponse);
 	} catch (err) {
