@@ -1,7 +1,7 @@
 import { Button } from '@mui/material';
 import { Row } from './SettingsModal.style';
 
-export const SettingsModal = (modalControl) => {
+export const SettingsModal = ({ modalControl }) => {
 	return (
 		<>
 			<Row>
