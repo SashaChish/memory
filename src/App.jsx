@@ -8,6 +8,7 @@ export default function App() {
 			<Routes>
 				<Route path='registration' element={<RegistrationPage />} />
 				<Route exact path='/login' element={<LogPage />} />
+				<Route exact path='/profile' />
 			</Routes>
 		</Router>
 	);
