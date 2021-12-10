@@ -3,7 +3,10 @@
     "browser": true,
     "es2021": true
   },
-  "extends": ["react-app", "prettier"],
+  "extends": [
+    "react-app",
+    "prettier"
+  ],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
@@ -11,7 +14,10 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": ["react", "prettier"],
+  "plugins": [
+    "react",
+    "prettier"
+  ],
   "rules": {
     "prettier/prettier": [
       "error",
@@ -23,7 +29,12 @@
         "singleQuote": true,
         "useTabs": true,
         "endOfLine": "auto",
-        "max-len": ["error", { "code": 80 }]
+        "max-len": [
+          "error",
+          {
+            "code": 80
+          }
+        ]
       }
     ]
   }
