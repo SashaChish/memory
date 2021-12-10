@@ -1,5 +1,6 @@
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
+import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -15,9 +16,12 @@ import { Search, SearchIconWrapper, StyledInputBase } from './Header.style';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 
+import { useSelector } from 'react-redux';
+
 export const Header = () => {
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+	const userData = useSelector((state) => state);
 
 	const isMenuOpen = Boolean(anchorEl);
 	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -111,7 +115,7 @@ export const Header = () => {
 	);
 
 	return (
-		<Box sx={{ flexGrow: 1 }}>
+		<Box sx={{ flexGrow: 1, paddingTop: '64px' }}>
 			<AppBar sx={{ backgroundColor: '#fff', color: '#000' }}>
 				<Toolbar sx={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
 					<Typography
@@ -154,7 +158,15 @@ export const Header = () => {
 							onClick={handleProfileMenuOpen}
 							sx={{ color: 'black' }}
 						>
-							<AccountCircle />
+							{userData?.avatar ? (
+								<Avatar
+									sx={{ width: 24, height: 24 }}
+									alt={userData?.username}
+									src={userData?.avatar}
+								/>
+							) : (
+								<AccountCircle />
+							)}
 						</IconButton>
 					</Box>
 					<Box sx={{ display: { xs: 'flex', md: 'none' } }}>

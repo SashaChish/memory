@@ -63,6 +63,7 @@ router.post(
 					user: room.id,
 					avatar: room.avatar,
 					username: username,
+					fullName: room.fullName,
 				});
 
 				profile.save();

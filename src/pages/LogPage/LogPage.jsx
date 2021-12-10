@@ -3,6 +3,9 @@ import { Visibility, VisibilityOff } from '@mui/icons-material/.';
 import { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/actions';
+import { userInfo } from '../../services';
 
 import {
 	ContentContainer,
@@ -24,6 +27,7 @@ export const LogPage = () => {
 		setPasswordShown(!passwordShown);
 	};
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 	function submitForm(e) {
 		e.preventDefault();
@@ -40,8 +44,13 @@ export const LogPage = () => {
 					email: e.target.email.value,
 					password: e.target.password.value,
 				},
-			}).then((data) => {
+			}).then(async (data) => {
 				localStorage.setItem('x-auth-token', data.data.token);
+
+				const userData = await userInfo();
+
+				dispatch(setUser(userData.data));
+
 				navigate('/username');
 			});
 		} else {
