@@ -51,7 +51,7 @@ export const LogPage = () => {
 
 				dispatch(setUser(userData.data));
 
-				navigate('/username');
+				navigate(`/${userData.data.username}`);
 			});
 		} else {
 			setError('error');
