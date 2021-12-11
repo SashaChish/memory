@@ -7,12 +7,14 @@ import {
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
+import { nanoid } from 'nanoid';
+
 export const Posts = ({ type, imgs }) => {
 	return (
 		<PostsWrapper>
 			<PostsContainer>
 				{imgs.map((img) => (
-					<PostItem>
+					<PostItem key={nanoid()}>
 						<img src={img?.picture} alt={type} />
 						<PostLinks>
 							<span>

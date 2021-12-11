@@ -1,6 +1,6 @@
-import { SET_USER } from './actionTypes';
+import { SET_USER } from '../actionTypes';
 
-const initState = JSON.parse(localStorage.getItem('userinfo')) || {
+const initState = {
 	_id: '',
 	fullName: '',
 	username: '',
@@ -16,10 +16,6 @@ export const userReducer = (state = initState, action) => {
 	switch (action.type) {
 		case SET_USER:
 			console.log({ ...state, ...action.payload });
-			localStorage.setItem(
-				'userinfo',
-				JSON.stringify({ ...state, ...action.payload })
-			);
 			return { ...state, ...action.payload };
 		default:
 			return state;
