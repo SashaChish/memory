@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Routes, Route, useParams, useNavigate } from 'react-router-dom';
+import { Link, Routes, Route, useParams, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AppsIcon from '@mui/icons-material/Apps';
@@ -39,26 +39,30 @@ export const UserPage = () => {
 	const avatar = useModal();
 	const settings = useModal();
 	const { username } = useParams();
-	const navigate = useNavigate();
+	const location = useLocation();
 	const [profileInfo, setProfileInfo] = useState({});
 	const [profilePosts, setProfilePosts] = useState([]);
 	const [profileSaved, setProfileSaved] = useState([]);
 	const [usersProfile, setUsersProfile] = useState(false);
 	const userData = useSelector((state) => state);
 
-	useEffect(async () => {
-		setUsersProfile(username === userData.username);
+	useEffect(() => {
+		async function fetchData() {
+			setUsersProfile(username === userData.username);
 
-		const profile = await $api.get(`/profile/${username}`);
-		const posts = await $api.get(`/profile/posts/${username}`);
-		const saved = await $api.get(`/profile/saved/me`);
+			const profile = await $api.get(`/profile/${username}`);
+			const posts = await $api.get(`/profile/posts/${username}`);
+			const saved = await $api.get(`/profile/saved/me`);
 
-		profile.status === 200 && setProfileInfo(profile.data);
-		posts.status === 200 && setProfilePosts(posts.data);
-		saved.status === 200 &&
-			username === userData.username &&
-			setProfileSaved(saved.data);
-	}, [navigate]);
+			profile.status === 200 && setProfileInfo(profile.data);
+			posts.status === 200 && setProfilePosts(posts.data);
+			saved.status === 200 &&
+				username === userData.username &&
+				setProfileSaved(saved.data);
+		}
+
+		fetchData();
+	}, [location]);
 
 	return (
 		<PageWrapper>
@@ -127,14 +131,22 @@ export const UserPage = () => {
 						</li>
 					</UlMobile>
 					<Navigation>
-						<Link to={`/${username}/`}>
+						<Link
+							to={`/${username}`}
+							className={location.pathname === `/${username}` ? 'active' : ''}
+						>
 							<span>
 								<AppsIcon />
 								<span>Posts</span>
 							</span>
 						</Link>
 						{usersProfile && (
-							<Link to={`/${username}/saved/`}>
+							<Link
+								to={`/${username}/saved`}
+								className={
+									location.pathname === `/${username}/saved` ? 'active' : ''
+								}
+							>
 								<span>
 									<BookmarkBorderOutlinedIcon />
 									<span>Saved</span>
