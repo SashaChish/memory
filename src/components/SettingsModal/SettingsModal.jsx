@@ -10,7 +10,7 @@ export const SettingsModal = ({ modalControl }) => {
 				</Button>
 			</Row>
 			<Row>
-				<Button color='inherit' variant='text'>
+				<Button color='inherit' variant='text' fullWidth>
 					Report a Problem
 				</Button>
 			</Row>
