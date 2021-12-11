@@ -4,7 +4,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../../redux/actions';
+import { setUser } from '../../redux/User/userActions';
 import { userInfo } from '../../services';
 
 import {
