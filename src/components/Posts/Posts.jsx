@@ -8,7 +8,6 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 
 export const Posts = ({ type, imgs }) => {
-	console.log(imgs);
 	return (
 		<PostsWrapper>
 			<PostsContainer>

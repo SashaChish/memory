@@ -49,15 +49,15 @@ export const UserPage = () => {
 	useEffect(async () => {
 		setUsersProfile(username === userData.username);
 
-		const result = await $api.get(`/profile/${username}`);
+		const profile = await $api.get(`/profile/${username}`);
 		const posts = await $api.get(`/profile/posts/${username}`);
 		const saved = await $api.get(`/profile/saved/me`);
 
-		result.status === 200 && setProfileInfo(result.data);
+		profile.status === 200 && setProfileInfo(profile.data);
 		posts.status === 200 && setProfilePosts(posts.data);
-		saved.status === 200 && usersProfile && setProfileSaved(saved.data);
-
-		console.log(saved.data);
+		saved.status === 200 &&
+			username === userData.username &&
+			setProfileSaved(saved.data);
 	}, [navigate]);
 
 	return (
@@ -149,7 +149,7 @@ export const UserPage = () => {
 							element={<Posts type='post' imgs={profilePosts} />}
 						/>
 						<Route
-							path='saved'
+							path='/saved/'
 							element={
 								usersProfile && <Posts type='saved' imgs={profileSaved} />
 							}
