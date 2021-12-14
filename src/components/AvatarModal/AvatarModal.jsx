@@ -21,7 +21,7 @@ export const AvatarModal = ({ modalControl }) => {
 				</Button>
 			</Row>
 			<Row>
-				<Button variant='text' color='error'>
+				<Button variant='text' color='error' fullWidth>
 					Remove Current Photo
 				</Button>
 			</Row>
