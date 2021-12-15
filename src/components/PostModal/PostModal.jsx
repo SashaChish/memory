@@ -105,7 +105,10 @@ export const PostModal = ({ modalControl, postId }) => {
 				},
 			}}
 		>
-			<PostImg src={postInfo?.avatar} alt={`${postInfo?.username}'s picture`} />
+			<PostImg
+				src={postInfo?.picture}
+				alt={`${postInfo?.username}'s picture`}
+			/>
 
 			<DialogInfo>
 				<BootstrapDialogTitle

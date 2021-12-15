@@ -36,7 +36,7 @@ router.get('/posts/:username', auth, async (req, res) => {
 			.sort({ date: -1 })
 			.lean();
 		const postsFinally = profilePosts.map((post) => ({
-			id: post.id,
+			_id: post._id,
 			picture: post.picture,
 			likes: post.likes.length,
 			comments: post.comments.length,
@@ -60,7 +60,7 @@ router.get('/saved/me', auth, async (req, res) => {
 				post.saved.some((elem) => elem.user.toString() === req.user.id)
 			)
 			.map((post) => ({
-				id: post.id,
+				_id: post._id,
 				picture: post.picture,
 				likes: post.likes.length,
 				comments: post.comments.length,
