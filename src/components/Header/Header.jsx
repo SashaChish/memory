@@ -16,6 +16,8 @@ import { Search, SearchIconWrapper, StyledInputBase } from './Header.style';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 
+import { Link } from 'react-router-dom';
+
 import { useSelector } from 'react-redux';
 
 export const Header = () => {
@@ -84,15 +86,35 @@ export const Header = () => {
 			open={isMobileMenuOpen}
 			onClose={handleMobileMenuClose}
 		>
-			<MenuItem>
-				<IconButton size='small'>Home</IconButton>
-			</MenuItem>
+			<Link
+				to='/'
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					textDecoration: 'none',
+				}}
+			>
+				<MenuItem>
+					<IconButton size='small'>Home</IconButton>
+				</MenuItem>
+			</Link>
+
 			<MenuItem>
 				<IconButton size='small'>Add Photo</IconButton>
 			</MenuItem>
-			<MenuItem>
-				<IconButton size='small'>History</IconButton>
-			</MenuItem>
+			<Link
+				to='/explore'
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					textDecoration: 'none',
+				}}
+			>
+				<MenuItem>
+					<IconButton size='small'>History</IconButton>
+				</MenuItem>
+			</Link>
+
 			<MenuItem>
 				<IconButton size='small'>Like</IconButton>
 			</MenuItem>
@@ -137,15 +159,35 @@ export const Header = () => {
 					</Search>
 					<Box sx={{ flexGrow: 1 }} />
 					<Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-						<IconButton sx={{ color: 'black' }}>
-							<HomeOutlinedIcon />
-						</IconButton>
+						<Link
+							to='/'
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								textDecoration: 'none',
+							}}
+						>
+							<IconButton sx={{ color: 'black' }}>
+								<HomeOutlinedIcon />
+							</IconButton>
+						</Link>
+
 						<IconButton sx={{ color: 'black' }}>
 							<AddBoxOutlinedIcon />
 						</IconButton>
-						<IconButton sx={{ color: 'black' }}>
-							<ExploreOutlinedIcon />
-						</IconButton>
+						<Link
+							to='/exlore'
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								textDecoration: 'none',
+							}}
+						>
+							<IconButton sx={{ color: 'black' }}>
+								<ExploreOutlinedIcon />
+							</IconButton>
+						</Link>
+
 						<IconButton sx={{ color: 'black' }}>
 							<FavoriteBorderRoundedIcon />
 						</IconButton>

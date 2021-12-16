@@ -65,7 +65,7 @@ export const LogPage = () => {
 					<MainBlock>
 						<Title>Memory</Title>
 						<FormWrapper>
-							<Form onSubmit={submitForm}>
+							<Form onSubmit={(e) => submitForm(e)}>
 								<BlockWrapper>
 									<Line />
 								</BlockWrapper>
