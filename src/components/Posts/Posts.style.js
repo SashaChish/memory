@@ -18,7 +18,7 @@ export const PostsContainer = styled.div`
 		object-fit: cover;
 	}
 
-	@media (max-width: 425px) {
+	@media (max-width: 426px) {
 		gap: 5px;
 	}
 `;

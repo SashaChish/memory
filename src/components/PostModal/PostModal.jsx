@@ -16,10 +16,15 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import './PostModal.css';
 
 import { Link } from 'react-router-dom';
 
+import { transformError } from '../../helpers';
+
 import {
+	PostModalContainer,
 	DialogInfo,
 	PostImg,
 	PostUsername,
@@ -59,6 +64,10 @@ const BootstrapDialogTitle = (props) => {
 export const PostModal = ({ modalControl, postId }) => {
 	const [postInfo, setPostInfo] = useState({});
 	const [commentText, setCommentText] = useState('');
+	const [liked, setLiked] = useState(false);
+	const [saved, setSaved] = useState(false);
+	const [mediaComments, setMediaComments] = useState(false);
+	const matches = useMediaQuery('(max-width:425px)');
 
 	useEffect(() => {
 		setPostInfo({});
@@ -67,11 +76,36 @@ export const PostModal = ({ modalControl, postId }) => {
 		const fetchData = async () => {
 			const result = await $api.get(`/posts/${postId}`);
 			setPostInfo(result.data);
-			console.log(result);
+
+			try {
+				const liked = await $api.put(`/posts/like/${postId}`);
+				const unliked = await $api.put(`/posts/unlike/${postId}`);
+				setLiked(false);
+			} catch (err) {
+				err = transformError(err);
+				if (err.status === 400) {
+					setLiked(true);
+				}
+			}
+
+			try {
+				const saved = await $api.put(`/posts/save/${postId}`);
+				const unsave = await $api.put(`/posts/unsave/${postId}`);
+				setSaved(false);
+			} catch (err) {
+				err = transformError(err);
+				if (err.status === 400) {
+					setSaved(true);
+				}
+			}
 		};
 
 		postId !== '' && fetchData();
 	}, [postId]);
+
+	useEffect(() => {
+		matches === false && setMediaComments(false);
+	}, [matches]);
 
 	const handleSendComment = async (e) => {
 		e.preventDefault();
@@ -89,122 +123,174 @@ export const PostModal = ({ modalControl, postId }) => {
 		}
 	};
 
-	return (
-		<Dialog
-			onClose={() => modalControl.handleCloseModal()}
-			aria-labelledby='post-popup'
-			open={modalControl.open}
-			PaperProps={{
-				style: {
-					borderRadius: '0 5px 5px 0',
-					display: 'flex',
-					flexDirection: 'row',
-					width: '90vw',
-					maxWidth: '100vw',
-					minHeight: '90vh',
-				},
-			}}
-		>
-			<PostImg
-				src={postInfo?.picture}
-				alt={`${postInfo?.username}'s picture`}
-			/>
+	const handleLike = async () => {
+		try {
+			const result = await $api.put(
+				`/posts/${liked ? 'unlike' : 'like'}/${postId}`
+			);
+			setLiked(!liked);
+		} catch (err) {
+			console.log(err);
+		}
+	};
 
-			<DialogInfo>
-				<BootstrapDialogTitle
-					id='customized-dialog-title'
-					onClose={() => modalControl.handleCloseModal()}
-					sx={{ display: 'flex', alignItems: 'center' }}
-				>
-					<Link to={`/${postInfo?.username}`}>
-						<Avatar
-							sx={{ width: 40, height: 40, marginRight: '20px' }}
-							alt={postInfo?.username}
-							src={postInfo?.avatar}
-						/>
-					</Link>
-					<Link
-						to={`/${postInfo?.username}`}
-						style={{ textDecoration: 'none' }}
+	const handleSave = async () => {
+		try {
+			const result = await $api.put(
+				`/posts/${saved ? 'unsave' : 'save'}/${postId}`
+			);
+			setSaved(!saved);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
+	const handleShowMediaComments = () => {
+		matches === true && setMediaComments(true);
+	};
+
+	return (
+		<div className='postModal'>
+			<Dialog
+				onClose={() => modalControl.handleCloseModal()}
+				aria-labelledby='post-popup'
+				open={modalControl.open}
+				className='postModalDialog'
+			>
+				<PostImg
+					src={postInfo?.picture}
+					alt={`${postInfo?.username}'s picture`}
+				/>
+
+				<DialogInfo>
+					<BootstrapDialogTitle
+						id='customized-dialog-title'
+						onClose={() => modalControl.handleCloseModal()}
+						sx={{ display: 'flex', alignItems: 'center' }}
 					>
-						<PostUsername>{postInfo?.username}</PostUsername>
-					</Link>
-				</BootstrapDialogTitle>
-				<DialogContent
-					dividers
-					sx={{ height: 'calc(100% - 65px - 70px - 75px)' }}
-				>
-					{postInfo?.comments?.map((comment) => (
-						<DialogComment>
-							<Link
-								to={`/${comment.username}`}
-								style={{ textDecoration: 'none' }}
-							>
-								<Avatar
-									sx={{ width: 40, height: 40, marginRight: '20px' }}
-									alt={comment.username}
-									src={comment.avatar}
-								/>
-							</Link>
-							<Typography
-								gutterBottom
-								sx={{ position: 'relative', width: '100%' }}
-							>
+						<Link to={`/${postInfo?.username}`}>
+							<Avatar
+								sx={{ width: 40, height: 40, marginRight: '20px' }}
+								alt={postInfo?.username}
+								src={postInfo?.avatar}
+							/>
+						</Link>
+						<Link
+							to={`/${postInfo?.username}`}
+							style={{ textDecoration: 'none', display: 'flex' }}
+						>
+							<PostUsername>{postInfo?.username}</PostUsername>
+						</Link>
+					</BootstrapDialogTitle>
+					{matches && (
+						<IconButton
+							aria-label='close'
+							onClick={() => modalControl.handleCloseModal()}
+							sx={{
+								position: 'absolute',
+								zIndex: 1,
+								right: 8,
+								top: 8,
+								color: (theme) => theme.palette.grey[500],
+							}}
+						>
+							<CloseIcon />
+						</IconButton>
+					)}
+					<DialogContent
+						dividers
+						style={{
+							display: `${
+								matches ? (mediaComments ? 'block' : 'none') : 'block'
+							}`,
+						}}
+					>
+						{postInfo?.comments?.map((comment) => (
+							<DialogComment>
 								<Link
 									to={`/${comment.username}`}
 									style={{ textDecoration: 'none' }}
 								>
-									<PostUsername>{comment.username}</PostUsername>
+									<Avatar
+										sx={{ width: 40, height: 40, marginRight: '20px' }}
+										alt={comment.username}
+										src={comment.avatar}
+									/>
 								</Link>
-								{'  '}
-								{comment.text}
-								<CommentDate>
-									<Moment fromNow>{new Date(comment.date)}</Moment>
-								</CommentDate>
-							</Typography>
-						</DialogComment>
-					))}
-				</DialogContent>
-				<DialogContent>
-					<PostIcon>
-						<FavoriteBorderIcon />
-					</PostIcon>
-					<PostIcon>
-						<ChatBubbleOutlineIcon />
-					</PostIcon>
-					<PostSaved>
-						<BookmarkBorderIcon />
-					</PostSaved>
-				</DialogContent>
-				<DialogActions sx={{ height: '60px', borderTop: '1px solid #E0E0E0' }}>
-					<CommentForm onSubmit={(e) => handleSendComment(e)}>
-						<TextField
-							variant='standard'
-							margin='normal'
-							fullWidth
-							multiline
-							name='comment'
-							autoFocus
-							placeholder='Write a comment...'
-							style={{ marginLeft: '20px' }}
-							value={commentText}
-							onChange={(e) => setCommentText(e.target.value)}
-							InputProps={{
-								disableUnderline: true,
-							}}
-						/>
-						<Button
-							variant='text'
-							type='submit'
-							disabled={commentText.trim() === ''}
-							style={{ backgroundColor: 'transparent' }}
-						>
-							Publish
-						</Button>
-					</CommentForm>
-				</DialogActions>
-			</DialogInfo>
-		</Dialog>
+								<Typography
+									gutterBottom
+									sx={{ position: 'relative', width: '100%' }}
+								>
+									<Link
+										to={`/${comment.username}`}
+										style={{ textDecoration: 'none' }}
+									>
+										<PostUsername>{comment.username}</PostUsername>
+									</Link>
+									{'  '}
+									{comment.text}
+									<CommentDate>
+										<Moment fromNow>{new Date(comment.date)}</Moment>
+									</CommentDate>
+								</Typography>
+							</DialogComment>
+						))}
+					</DialogContent>
+					<DialogContent>
+						<PostIcon onClick={() => handleLike()}>
+							{liked ? (
+								<FavoriteIcon style={{ color: '#ED4956' }} />
+							) : (
+								<FavoriteBorderIcon />
+							)}
+						</PostIcon>
+						<PostIcon onClick={() => handleShowMediaComments()}>
+							<ChatBubbleOutlineIcon />
+						</PostIcon>
+						<PostSaved onClick={() => handleSave()}>
+							{saved ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+						</PostSaved>
+					</DialogContent>
+					<DialogActions
+						sx={{
+							height: '60px',
+							borderTop: '1px solid #E0E0E0',
+							display: `${
+								matches
+									? mediaComments
+										? 'block !important'
+										: 'none !important'
+									: 'block'
+							}`,
+						}}
+					>
+						<CommentForm onSubmit={(e) => handleSendComment(e)}>
+							<TextField
+								variant='standard'
+								margin='normal'
+								fullWidth
+								name='comment'
+								autoFocus
+								placeholder='Write a comment...'
+								value={commentText}
+								onChange={(e) => setCommentText(e.target.value)}
+								InputProps={{
+									disableUnderline: true,
+								}}
+							/>
+							<Button
+								variant='text'
+								type='submit'
+								disabled={commentText.trim() === ''}
+								style={{ backgroundColor: 'transparent' }}
+							>
+								Publish
+							</Button>
+						</CommentForm>
+					</DialogActions>
+				</DialogInfo>
+			</Dialog>
+		</div>
 	);
 };
 
