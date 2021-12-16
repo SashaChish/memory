@@ -19,12 +19,13 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import './PostModal.css';
 
+import { nanoid } from 'nanoid';
+
 import { Link } from 'react-router-dom';
 
 import { transformError } from '../../helpers';
 
 import {
-	PostModalContainer,
 	DialogInfo,
 	PostImg,
 	PostUsername,
@@ -67,7 +68,7 @@ export const PostModal = ({ modalControl, postId }) => {
 	const [liked, setLiked] = useState(false);
 	const [saved, setSaved] = useState(false);
 	const [mediaComments, setMediaComments] = useState(false);
-	const matches = useMediaQuery('(max-width:425px)');
+	const matches = useMediaQuery('(max-width:426px)');
 
 	useEffect(() => {
 		setPostInfo({});
@@ -78,8 +79,8 @@ export const PostModal = ({ modalControl, postId }) => {
 			setPostInfo(result.data);
 
 			try {
-				const liked = await $api.put(`/posts/like/${postId}`);
-				const unliked = await $api.put(`/posts/unlike/${postId}`);
+				await $api.put(`/posts/like/${postId}`);
+				await $api.put(`/posts/unlike/${postId}`);
 				setLiked(false);
 			} catch (err) {
 				err = transformError(err);
@@ -89,8 +90,8 @@ export const PostModal = ({ modalControl, postId }) => {
 			}
 
 			try {
-				const saved = await $api.put(`/posts/save/${postId}`);
-				const unsave = await $api.put(`/posts/unsave/${postId}`);
+				await $api.put(`/posts/save/${postId}`);
+				await $api.put(`/posts/unsave/${postId}`);
 				setSaved(false);
 			} catch (err) {
 				err = transformError(err);
@@ -125,9 +126,7 @@ export const PostModal = ({ modalControl, postId }) => {
 
 	const handleLike = async () => {
 		try {
-			const result = await $api.put(
-				`/posts/${liked ? 'unlike' : 'like'}/${postId}`
-			);
+			await $api.put(`/posts/${liked ? 'unlike' : 'like'}/${postId}`);
 			setLiked(!liked);
 		} catch (err) {
 			console.log(err);
@@ -136,9 +135,7 @@ export const PostModal = ({ modalControl, postId }) => {
 
 	const handleSave = async () => {
 		try {
-			const result = await $api.put(
-				`/posts/${saved ? 'unsave' : 'save'}/${postId}`
-			);
+			await $api.put(`/posts/${saved ? 'unsave' : 'save'}/${postId}`);
 			setSaved(!saved);
 		} catch (err) {
 			console.log(err);
@@ -182,10 +179,10 @@ export const PostModal = ({ modalControl, postId }) => {
 							<PostUsername>{postInfo?.username}</PostUsername>
 						</Link>
 					</BootstrapDialogTitle>
-					{matches && (
+					{matches && mediaComments && (
 						<IconButton
 							aria-label='close'
-							onClick={() => modalControl.handleCloseModal()}
+							onClick={() => setMediaComments(false)}
 							sx={{
 								position: 'absolute',
 								zIndex: 1,
@@ -199,6 +196,7 @@ export const PostModal = ({ modalControl, postId }) => {
 					)}
 					<DialogContent
 						dividers
+						className='postComments'
 						style={{
 							display: `${
 								matches ? (mediaComments ? 'block' : 'none') : 'block'
@@ -206,7 +204,7 @@ export const PostModal = ({ modalControl, postId }) => {
 						}}
 					>
 						{postInfo?.comments?.map((comment) => (
-							<DialogComment>
+							<DialogComment key={nanoid()}>
 								<Link
 									to={`/${comment.username}`}
 									style={{ textDecoration: 'none' }}
@@ -236,7 +234,7 @@ export const PostModal = ({ modalControl, postId }) => {
 							</DialogComment>
 						))}
 					</DialogContent>
-					<DialogContent>
+					<DialogContent className='postActions'>
 						<PostIcon onClick={() => handleLike()}>
 							{liked ? (
 								<FavoriteIcon style={{ color: '#ED4956' }} />
@@ -253,7 +251,7 @@ export const PostModal = ({ modalControl, postId }) => {
 					</DialogContent>
 					<DialogActions
 						sx={{
-							height: '60px',
+							height: 'auto',
 							borderTop: '1px solid #E0E0E0',
 							display: `${
 								matches
@@ -263,6 +261,7 @@ export const PostModal = ({ modalControl, postId }) => {
 									: 'block'
 							}`,
 						}}
+						className='postForm'
 					>
 						<CommentForm onSubmit={(e) => handleSendComment(e)}>
 							<TextField

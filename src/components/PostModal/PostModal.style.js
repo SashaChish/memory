@@ -5,8 +5,8 @@ export const DialogInfo = styled.div`
 	max-height: 100%;
 	overflow: hidden;
 
-	.css-1t4vnk2-MuiDialogContent-root {
-		height: calc(100% - 65px - 70px - 75px);
+	.postComments {
+		height: calc(100% - 65px - 77px - 75px);
 	}
 
 	@media (max-width: 1024px) {
@@ -19,7 +19,7 @@ export const DialogInfo = styled.div`
 			font-size: 14px;
 		}
 
-		.css-1t4vnk2-MuiDialogContent-root {
+		.postComments {
 			height: calc(100% - 66px - 57px - 60px);
 		}
 	}
@@ -27,7 +27,7 @@ export const DialogInfo = styled.div`
 	@media (max-width: 426px) {
 		width: 100%;
 
-		.css-1t4vnk2-MuiDialogContent-root {
+		.postComments {
 			display: none;
 			position: absolute;
 			top: 0;
@@ -36,7 +36,7 @@ export const DialogInfo = styled.div`
 			height: -webkit-fill-available;
 		}
 
-		.css-1pf00k0-MuiDialogActions-root {
+		.postForm {
 			display: none;
 			position: absolute;
 			bottom: 0;
@@ -46,7 +46,7 @@ export const DialogInfo = styled.div`
 			margin-top: 10px;
 		}
 
-		.css-ypiqx9-MuiDialogContent-root {
+		.postActions {
 			border-top: 1px solid #e0e0e0;
 		}
 	}
@@ -99,9 +99,15 @@ export const CommentForm = styled.form`
 	width: 100%;
 	height: 60px;
 	align-items: center;
-	padding: 12px;
+	padding: 0 12px;
+
+	> div {
+		margin-top: 10px;
+	}
 
 	@media (max-width: 1024px) {
+		height: 45px;
+
 		input {
 			font-size: 13px;
 		}
