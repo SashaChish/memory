@@ -137,6 +137,14 @@ export const PostIcon = styled.span`
 			font-size: 22px;
 		}
 	}
+
+	@media (max-width: 1024px) {
+		font-size: 16px;
+	}
+
+	@media (max-width: 426px) {
+		font-size: 14px;
+	}
 `;
 
 export const PostSaved = styled(PostIcon)`
