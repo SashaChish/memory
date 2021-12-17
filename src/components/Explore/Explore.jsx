@@ -53,6 +53,40 @@ export const Explore = () => {
 							</Info>
 						</Div>
 					))}
+					{posts.map((post) => (
+						<Div key={post._id} onClick={() => handleOpenPost(post._id)}>
+							<Image src={post.picture}></Image>
+							<Info>
+								<Ul>
+									<Li style={{ marginRight: '30px' }}>
+										<FavoriteIcon style={{ marginRight: '10px' }} />
+										{post.likes.length}
+									</Li>
+									<Li>
+										<ModeCommentIcon style={{ marginRight: '10px' }} />
+										{post.comments.length}
+									</Li>
+								</Ul>
+							</Info>
+						</Div>
+					))}
+					{posts.map((post) => (
+						<Div key={post._id} onClick={() => handleOpenPost(post._id)}>
+							<Image src={post.picture}></Image>
+							<Info>
+								<Ul>
+									<Li style={{ marginRight: '30px' }}>
+										<FavoriteIcon style={{ marginRight: '10px' }} />
+										{post.likes.length}
+									</Li>
+									<Li>
+										<ModeCommentIcon style={{ marginRight: '10px' }} />
+										{post.comments.length}
+									</Li>
+								</Ul>
+							</Info>
+						</Div>
+					))}
 				</Photos>
 			</Wrapper>
 			<PostModal

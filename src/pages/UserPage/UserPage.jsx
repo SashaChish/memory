@@ -10,8 +10,11 @@ import { useModal } from '../../hooks/useModal';
 
 import { Posts } from '../../components/Posts';
 import { Modal } from '../../components/Modal';
+import { NotFoundPage } from '../NotFoundPage';
 import { AvatarModal } from '../../components/AvatarModal';
 import { SettingsModal } from '../../components/SettingsModal';
+
+import { transformError } from '../../helpers';
 
 import {
 	Main,
@@ -45,16 +48,25 @@ export const UserPage = () => {
 	const [profileSaved, setProfileSaved] = useState([]);
 	const [usersProfile, setUsersProfile] = useState(false);
 	const userData = useSelector((state) => state);
+	const [notFoundError, setNotFoundError] = useState(false);
 
 	useEffect(() => {
 		async function fetchData() {
 			setUsersProfile(username === userData.username);
 
-			const profile = await $api.get(`/profile/${username}`);
+			try {
+				const profile = await $api.get(`/profile/${username}`);
+				setProfileInfo(profile.data);
+			} catch (err) {
+				err = transformError(err);
+				if (err.status === 404) {
+					setNotFoundError(true);
+				}
+			}
+
 			const posts = await $api.get(`/profile/posts/${username}`);
 			const saved = await $api.get(`/profile/saved/me`);
 
-			profile.status === 200 && setProfileInfo(profile.data);
 			posts.status === 200 && setProfilePosts(posts.data);
 			saved.status === 200 &&
 				username === userData.username &&
@@ -77,7 +89,7 @@ export const UserPage = () => {
 		}
 	};
 
-	return (
+	return !notFoundError ? (
 		<PageWrapper>
 			<Main>
 				<ContentContainer>
@@ -195,5 +207,7 @@ export const UserPage = () => {
 				</ContentContainer>
 			</Main>
 		</PageWrapper>
+	) : (
+		<NotFoundPage />
 	);
 };
