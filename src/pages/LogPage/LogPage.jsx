@@ -4,7 +4,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../../redux/actions';
+import { setUser } from '../../redux/User/userActions';
 import { userInfo } from '../../services';
 
 import {
@@ -65,7 +65,7 @@ export const LogPage = () => {
 					<MainBlock>
 						<Title>Memory</Title>
 						<FormWrapper>
-							<Form onSubmit={submitForm}>
+							<Form onSubmit={(e) => submitForm(e)}>
 								<BlockWrapper>
 									<Line />
 								</BlockWrapper>

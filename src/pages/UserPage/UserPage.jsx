@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Routes, Route, useParams, useNavigate } from 'react-router-dom';
+import { Link, Routes, Route, useParams, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AppsIcon from '@mui/icons-material/Apps';
@@ -10,8 +10,11 @@ import { useModal } from '../../hooks/useModal';
 
 import { Posts } from '../../components/Posts';
 import { Modal } from '../../components/Modal';
+import { NotFoundPage } from '../NotFoundPage';
 import { AvatarModal } from '../../components/AvatarModal';
 import { SettingsModal } from '../../components/SettingsModal';
+
+import { transformError } from '../../helpers';
 
 import {
 	Main,
@@ -39,28 +42,54 @@ export const UserPage = () => {
 	const avatar = useModal();
 	const settings = useModal();
 	const { username } = useParams();
-	const navigate = useNavigate();
+	const location = useLocation();
 	const [profileInfo, setProfileInfo] = useState({});
 	const [profilePosts, setProfilePosts] = useState([]);
 	const [profileSaved, setProfileSaved] = useState([]);
 	const [usersProfile, setUsersProfile] = useState(false);
 	const userData = useSelector((state) => state);
+	const [notFoundError, setNotFoundError] = useState(false);
 
-	useEffect(async () => {
-		setUsersProfile(username === userData.username);
+	useEffect(() => {
+		async function fetchData() {
+			setUsersProfile(username === userData.username);
 
-		const result = await $api.get(`/profile/${username}`);
-		const posts = await $api.get(`/profile/posts/${username}`);
-		const saved = await $api.get(`/profile/saved/me`);
+			try {
+				const profile = await $api.get(`/profile/${username}`);
+				setProfileInfo(profile.data);
+			} catch (err) {
+				err = transformError(err);
+				if (err.status === 404) {
+					setNotFoundError(true);
+				}
+			}
 
-		result.status === 200 && setProfileInfo(result.data);
-		posts.status === 200 && setProfilePosts(posts.data);
-		saved.status === 200 && usersProfile && setProfileSaved(saved.data);
+			const posts = await $api.get(`/profile/posts/${username}`);
+			const saved = await $api.get(`/profile/saved/me`);
 
-		console.log(saved.data);
-	}, [navigate]);
+			posts.status === 200 && setProfilePosts(posts.data);
+			saved.status === 200 &&
+				username === userData.username &&
+				setProfileSaved(saved.data);
+		}
 
-	return (
+		fetchData();
+	}, [location]);
+
+	const handleUpdateHover = async () => {
+		try {
+			const posts = await $api.get(`/profile/posts/${username}`);
+			console.log(posts);
+			setProfilePosts(posts.data);
+
+			const saved = await $api.get(`/profile/saved/me`);
+			setProfileSaved(saved.data);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
+	return !notFoundError ? (
 		<PageWrapper>
 			<Main>
 				<ContentContainer>
@@ -127,14 +156,22 @@ export const UserPage = () => {
 						</li>
 					</UlMobile>
 					<Navigation>
-						<Link to={`/${username}/`}>
+						<Link
+							to={`/${username}`}
+							className={location.pathname === `/${username}` ? 'active' : ''}
+						>
 							<span>
 								<AppsIcon />
 								<span>Posts</span>
 							</span>
 						</Link>
 						{usersProfile && (
-							<Link to={`/${username}/saved/`}>
+							<Link
+								to={`/${username}/saved`}
+								className={
+									location.pathname === `/${username}/saved` ? 'active' : ''
+								}
+							>
 								<span>
 									<BookmarkBorderOutlinedIcon />
 									<span>Saved</span>
@@ -146,17 +183,31 @@ export const UserPage = () => {
 					<Routes>
 						<Route
 							path='/'
-							element={<Posts type='post' imgs={profilePosts} />}
+							element={
+								<Posts
+									handleUpdateHover={handleUpdateHover}
+									type='post'
+									imgs={profilePosts}
+								/>
+							}
 						/>
 						<Route
-							path='saved'
+							path='/saved/'
 							element={
-								usersProfile && <Posts type='saved' imgs={profileSaved} />
+								usersProfile && (
+									<Posts
+										handleUpdateHover={handleUpdateHover}
+										type='saved'
+										imgs={profileSaved}
+									/>
+								)
 							}
 						/>
 					</Routes>
 				</ContentContainer>
 			</Main>
 		</PageWrapper>
+	) : (
+		<NotFoundPage />
 	);
 };

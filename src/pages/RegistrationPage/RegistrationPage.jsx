@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 import { useDispatch } from 'react-redux';
-import { setUser } from '../../redux/actions';
+import { setUser } from '../../redux/User/userActions';
 
 import { registration, userInfo } from '../../services';
 import { useInput } from '../../hooks';
