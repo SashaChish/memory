@@ -16,6 +16,7 @@ export const PostsContainer = styled.div`
 		max-width: 100%;
 		height: 100%;
 		object-fit: cover;
+		min-height: 200px;
 	}
 
 	@media (max-width: 426px) {
@@ -61,6 +62,7 @@ export const PostItem = styled.div`
 		left: 0;
 		width: 100%;
 		height: 100%;
+		min-height: 200px;
 		background-color: rgba(0, 0, 0, 0);
 	}
 

@@ -23,6 +23,15 @@ export const Explore = () => {
 		postControl.handleOpenModal();
 	};
 
+	const handleUpdateHover = async () => {
+		try {
+			const posts = await $api.get(`/posts`);
+			setPosts(posts.data);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
 	return (
 		<>
 			<Wrapper>
@@ -32,12 +41,12 @@ export const Explore = () => {
 							<Image src={post.picture}></Image>
 							<Info>
 								<Ul>
-									<Li>
-										<FavoriteIcon />
+									<Li style={{ marginRight: '30px' }}>
+										<FavoriteIcon style={{ marginRight: '10px' }} />
 										{post.likes.length}
 									</Li>
 									<Li>
-										<ModeCommentIcon />
+										<ModeCommentIcon style={{ marginRight: '10px' }} />
 										{post.comments.length}
 									</Li>
 								</Ul>
@@ -46,7 +55,11 @@ export const Explore = () => {
 					))}
 				</Photos>
 			</Wrapper>
-			<PostModal modalControl={postControl} postId={postId} />
+			<PostModal
+				handleUpdateHover={handleUpdateHover}
+				modalControl={postControl}
+				postId={postId}
+			/>
 		</>
 	);
 };

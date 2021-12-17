@@ -63,8 +63,23 @@ export const Header = () => {
 			open={isMenuOpen}
 			onClose={handleMenuClose}
 		>
-			<MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-			<MenuItem onClick={handleMenuClose}>LogOut</MenuItem>
+			<MenuItem onClick={handleMenuClose}>
+				<Link
+					to={`/${userData?.username}`}
+					style={{ textDecoration: 'none', color: '#000' }}
+				>
+					Profile
+				</Link>
+			</MenuItem>
+			<MenuItem onClick={handleMenuClose}>
+				<Link
+					to='/login'
+					style={{ textDecoration: 'none', color: '#000' }}
+					onClick={() => localStorage.clear()}
+				>
+					LogOut
+				</Link>
+			</MenuItem>
 		</Menu>
 	);
 
@@ -86,52 +101,50 @@ export const Header = () => {
 			open={isMobileMenuOpen}
 			onClose={handleMobileMenuClose}
 		>
-			<Link
-				to='/'
-				style={{
-					display: 'flex',
-					alignItems: 'center',
-					textDecoration: 'none',
-				}}
-			>
-				<MenuItem>
-					<IconButton size='small'>Home</IconButton>
-				</MenuItem>
-			</Link>
-
 			<MenuItem>
-				<IconButton size='small'>Add Photo</IconButton>
-			</MenuItem>
-			<Link
-				to='/explore'
-				style={{
-					display: 'flex',
-					alignItems: 'center',
-					textDecoration: 'none',
-				}}
-			>
-				<MenuItem>
-					<IconButton size='small'>History</IconButton>
-				</MenuItem>
-			</Link>
-
-			<MenuItem>
-				<IconButton size='small'>Like</IconButton>
-			</MenuItem>
-			<MenuItem onClick={handleProfileMenuOpen}>
-				<IconButton
-					size='small'
-					edge='end'
-					aria-label='account of current user'
-					aria-controls={menuId}
-					aria-haspopup='true'
-					onClick={handleProfileMenuOpen}
+				<Link
+					to='/'
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						textDecoration: 'none',
+						color: 'rgba(0, 0, 0, 0.54)',
+					}}
 				>
-					Profile
-				</IconButton>
+					Home
+				</Link>
+			</MenuItem>
+
+			<MenuItem style={{ color: 'rgba(0, 0, 0, 0.54)' }}>Add Photo</MenuItem>
+			<MenuItem>
+				<Link
+					to='/explore'
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						textDecoration: 'none',
+						color: 'rgba(0, 0, 0, 0.54)',
+					}}
+				>
+					History
+				</Link>
+			</MenuItem>
+
+			<MenuItem style={{ color: 'rgba(0, 0, 0, 0.54)' }}>Like</MenuItem>
+			<MenuItem
+				onClick={handleProfileMenuOpen}
+				style={{ color: 'rgba(0, 0, 0, 0.54)' }}
+			>
+				Profile
 			</MenuItem>
 			<MenuItem>
-				<IconButton size='small'>LogOut</IconButton>
+				<Link
+					to='/login'
+					style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.54)' }}
+					onClick={() => localStorage.clear()}
+				>
+					LogOut
+				</Link>
 			</MenuItem>
 		</Menu>
 	);
@@ -140,14 +153,16 @@ export const Header = () => {
 		<Box sx={{ flexGrow: 1, paddingTop: '64px' }}>
 			<AppBar sx={{ backgroundColor: '#fff', color: '#000' }}>
 				<Toolbar sx={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-					<Typography
-						variant='h6'
-						noWrap
-						component='div'
-						sx={{ display: { xs: 'none', sm: 'block' }, color: 'black' }}
-					>
-						Memory
-					</Typography>
+					<Link to='/' style={{ textDecoration: 'none' }}>
+						<Typography
+							variant='h6'
+							noWrap
+							component='div'
+							sx={{ display: { xs: 'none', sm: 'block' }, color: 'black' }}
+						>
+							Memory
+						</Typography>
+					</Link>
 					<Search>
 						<SearchIconWrapper>
 							<SearchIcon />
@@ -176,7 +191,7 @@ export const Header = () => {
 							<AddBoxOutlinedIcon />
 						</IconButton>
 						<Link
-							to='/exlore'
+							to='/explore'
 							style={{
 								display: 'flex',
 								alignItems: 'center',
