@@ -43,7 +43,6 @@ router.post(
 		}
 	}
 );
-
 //@route    GET api/posts
 //@desc     Get all posts
 //@access   Private
