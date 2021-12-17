@@ -25,7 +25,6 @@ import { Link } from 'react-router-dom';
 
 import { transformError } from '../../helpers';
 
-
 import {
 	DialogInfo,
 	PostImg,
@@ -63,7 +62,7 @@ const BootstrapDialogTitle = (props) => {
 	);
 };
 
-export const PostModal = ({ modalControl, postId }) => {
+export const PostModal = ({ handleUpdateHover, modalControl, postId }) => {
 	const [postInfo, setPostInfo] = useState({});
 	const [commentText, setCommentText] = useState('');
 	const [liked, setLiked] = useState(false);
@@ -77,6 +76,7 @@ export const PostModal = ({ modalControl, postId }) => {
 
 		const fetchData = async () => {
 			const result = await $api.get(`/posts/${postId}`);
+			console.log(result.data);
 			setPostInfo(result.data);
 
 			try {
@@ -118,6 +118,7 @@ export const PostModal = ({ modalControl, postId }) => {
 			});
 
 			setPostInfo({ ...postInfo, comments: result.data });
+			handleUpdateHover();
 
 			setCommentText('');
 		} catch (err) {
@@ -129,6 +130,10 @@ export const PostModal = ({ modalControl, postId }) => {
 		try {
 			await $api.put(`/posts/${liked ? 'unlike' : 'like'}/${postId}`);
 			setLiked(!liked);
+			handleUpdateHover();
+
+			const result = await $api.get(`/posts/${postId}`);
+			setPostInfo({ ...postInfo, likes: result.data.likes });
 		} catch (err) {
 			console.log(err);
 		}
@@ -137,6 +142,7 @@ export const PostModal = ({ modalControl, postId }) => {
 	const handleSave = async () => {
 		try {
 			await $api.put(`/posts/${saved ? 'unsave' : 'save'}/${postId}`);
+			handleUpdateHover();
 			setSaved(!saved);
 		} catch (err) {
 			console.log(err);
@@ -238,10 +244,13 @@ export const PostModal = ({ modalControl, postId }) => {
 					<DialogContent className='postActions'>
 						<PostIcon onClick={() => handleLike()}>
 							{liked ? (
-								<FavoriteIcon style={{ color: '#ED4956' }} />
+								<FavoriteIcon
+									style={{ color: '#ED4956', marginRight: '5px' }}
+								/>
 							) : (
-								<FavoriteBorderIcon />
+								<FavoriteBorderIcon style={{ marginRight: '5px' }} />
 							)}
+							{postInfo?.likes?.length > 0 && postInfo?.likes?.length}
 						</PostIcon>
 						<PostIcon onClick={() => handleShowMediaComments()}>
 							<ChatBubbleOutlineIcon />
@@ -300,4 +309,5 @@ PostModal.propTypes = {
 		handleCloseModal: PropTypes.func.isRequired,
 	}).isRequired,
 	postId: PropTypes.string,
+	handleUpdateHover: PropTypes.func,
 };

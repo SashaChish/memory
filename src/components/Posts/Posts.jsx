@@ -12,7 +12,7 @@ import { useModal } from '../../hooks/useModal';
 
 import { PostModal } from '../PostModal';
 
-export const Posts = ({ type, imgs }) => {
+export const Posts = ({ handleUpdateHover, type, imgs }) => {
 	const postControl = useModal();
 	const [postId, setPostId] = useState('');
 
@@ -40,7 +40,11 @@ export const Posts = ({ type, imgs }) => {
 					))}
 				</PostsContainer>
 			</PostsWrapper>
-			<PostModal modalControl={postControl} postId={postId} />
+			<PostModal
+				handleUpdateHover={handleUpdateHover}
+				modalControl={postControl}
+				postId={postId}
+			/>
 		</>
 	);
 };

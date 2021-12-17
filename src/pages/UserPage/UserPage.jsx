@@ -64,6 +64,19 @@ export const UserPage = () => {
 		fetchData();
 	}, [location]);
 
+	const handleUpdateHover = async () => {
+		try {
+			const posts = await $api.get(`/profile/posts/${username}`);
+			console.log(posts);
+			setProfilePosts(posts.data);
+
+			const saved = await $api.get(`/profile/saved/me`);
+			setProfileSaved(saved.data);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
 	return (
 		<PageWrapper>
 			<Main>
@@ -158,12 +171,24 @@ export const UserPage = () => {
 					<Routes>
 						<Route
 							path='/'
-							element={<Posts type='post' imgs={profilePosts} />}
+							element={
+								<Posts
+									handleUpdateHover={handleUpdateHover}
+									type='post'
+									imgs={profilePosts}
+								/>
+							}
 						/>
 						<Route
 							path='/saved/'
 							element={
-								usersProfile && <Posts type='saved' imgs={profileSaved} />
+								usersProfile && (
+									<Posts
+										handleUpdateHover={handleUpdateHover}
+										type='saved'
+										imgs={profileSaved}
+									/>
+								)
 							}
 						/>
 					</Routes>
