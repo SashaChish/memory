@@ -125,6 +125,10 @@ export const CommentForm = styled.form`
 export const PostIcon = styled.span`
 	cursor: pointer;
 	margin-right: 20px;
+	font-size: 20px;
+	display: flex;
+	align-items: center;
+	float: left;
 
 	svg {
 		font-size: 30px;
