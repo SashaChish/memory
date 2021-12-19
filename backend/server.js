@@ -2,9 +2,8 @@ const express = require('express');
 const connectDB = require('./config/db.js');
 const cors = require('cors');
 const aws = require('aws-sdk');
-const multer = require('multer');
-const multerS3 = require('multer-s3');
 const fs = require('fs');
+const path = require('path');
 
 const app = express();
 
@@ -31,33 +30,39 @@ app.use('/api/auth', require('./routes/api/auth.js'));
 app.use('/api/posts', require('./routes/api/posts.js'));
 app.use('/api/profile', require('./routes/api/profile.js'));
 
-app.get('/upload', (req, res) => {
-	const file = fs.readFileSync(
-		'C:/Users/dvory/OneDrive/Робочий стіл/NO MR_STOCK FOOTAGE NO MR (290)_preview.mp4'
-	);
+app.post('/readfile', (req, res) => {
+	const filePath = path.join(__dirname, '/file.jpg');
+	const stream = fs.createWriteStream(filePath);
+	stream.on('open', () => req.pipe(stream));
 
-	s3.putObject(
-		{
+	stream.on('close', () => {
+		// Send a success response back to the client
+		const file = fs.readFileSync(filePath);
+
+		const params = {
 			Bucket: 'asd-internship',
-			Key: 'test-video.mp4',
+			Key: 'stream.mp4',
 			Body: file,
 			ACL: 'public-read',
-		},
-		(err, data) => {
+		};
+
+		//check for type
+		s3.putObject(params, (err, data) => {
 			if (err) return console.log(err);
-			console.log('Your video has been uploaded successfully!', data);
-		}
-	);
+			console.log('Your stream img has been uploaded successfully!', data);
+		});
 
-	res.json('Success');
-});
-
-app.get('/getFile', (req, res) => {
-	const url = s3.getSignedUrl('getObject', {
-		Bucket: 'asd-internship',
-		Key: `test-video.mp4`,
+		const url = s3.getSignedUrl('getObject', {
+			Bucket: 'asd-internship',
+			Key: `stream.mp4`,
+		});
+		res.send(url);
 	});
-	res.send(url);
+
+	stream.on('error', (err) => {
+		console.error(err);
+		res.status(500).send({ status: 'error', err });
+	});
 });
 
 const PORT = process.env.PORT || 5000;
