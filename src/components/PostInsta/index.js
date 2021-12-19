@@ -1,0 +1,1 @@
+export { PostInsta } from './PostInsta';
