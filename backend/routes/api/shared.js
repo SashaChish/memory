@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const auth = require('../../middleware/auth.js');
+const { nanoid } = require('nanoid');
 
 const aws = require('aws-sdk');
 const fs = require('fs');
@@ -32,6 +33,7 @@ router.post('/host', auth, async (req, res) => {
 		const stream = fs.createWriteStream(filePath);
 		console.log(stream);
 		stream.on('open', () => req.pipe(stream));
+		const fileId = nanoid();
 
 		stream.on('close', () => {
 			// Send a success response back to the client
@@ -39,7 +41,7 @@ router.post('/host', auth, async (req, res) => {
 
 			const params = {
 				Bucket: 'asd-internship',
-				Key: 'stream.mp4',
+				Key: `${req.user.id}.${fileId}.mp4`,
 				Body: file,
 				ACL: 'public-read',
 			};
@@ -52,9 +54,9 @@ router.post('/host', auth, async (req, res) => {
 
 			const url = s3.getSignedUrl('getObject', {
 				Bucket: 'asd-internship',
-				Key: `stream.mp4`,
+				Key: `${req.user.id}.${fileId}.mp4`,
 			});
-			res.send(url);
+			res.send(url.substring(0, url.indexOf('?')));
 		});
 
 		stream.on('error', (err) => {
