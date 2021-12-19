@@ -27,7 +27,10 @@ router.post(
 			const newPost = new Post({
 				user: req.user.id,
 				description: req.body.description,
-				picture: req.body.picture,
+				file: {
+					fileLink: req.body.file.fileLink,
+					fileType: req.body.file.fileType,
+				},
 				username: user.username,
 				avatar: user.avatar,
 			});
