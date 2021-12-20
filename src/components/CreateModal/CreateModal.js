@@ -21,6 +21,7 @@ import {
 
 import { Link } from 'react-router-dom';
 import { $api } from '../../http';
+import axios from 'axios';
 
 const BootstrapDialogTitle = (props) => {
 	const { children, onClose, ...other } = props;
@@ -46,47 +47,46 @@ const BootstrapDialogTitle = (props) => {
 	);
 };
 export const CreateModal = ({ modalControl }) => {
-	const [file, setFile] = useState({});
-	const [binary, setBinary] = useState('');
+	const [fileType, setFileType] = useState('');
+	const [fileLink, setFileLink] = useState('');
+	const [file, setFile] = useState('');
 	const inputRef = useRef(null);
 
 	const handlePickFile = (e) => {
 		const imgArray = ['image/jpeg', 'image/jpg', 'image/png'];
 		const file = Object(e.currentTarget.files)[0];
-		const reader = new FileReader();
-		setFile({
-			fileType: imgArray.includes(file.type)
+		setFile(file);
+		setFileType(
+			imgArray.includes(file.type)
 				? 'png'
 				: file.type === 'video/mp4'
 				? 'mp4'
-				: '',
-		});
-
-		reader.onloadend = function () {
-			var data = reader.result.split(',')[1];
-			var binaryBlob = atob(data);
-			setBinary(binaryBlob);
-		};
-
-		if (file) {
-			reader.readAsDataURL(file);
-		}
+				: ''
+		);
 	};
 
 	useEffect(() => {
 		const fetchData = async () => {
-			console.log(binary);
-			const result = await $api.post(`/shared/host/${file.fileType}`, binary);
-			result.status === 200 &&
-				setFile({
-					...file,
-					fileLink: result.data,
-				});
-			console.log(result.data);
+			console.log(fileType, fileLink);
+			axios({
+				method: 'post',
+				url: `http://localhost:5000/api/shared/host/${fileType}`,
+				data: file,
+				headers: {
+					'x-auth-token': localStorage.getItem('x-auth-token'),
+				},
+			})
+				.then((result) => {
+					console.log(result.data);
+					setTimeout(() => {
+						setFileLink(result.data);
+					}, 1000);
+				})
+				.catch((err) => console.log(err));
 		};
 
-		file?.fileType && binary && fetchData();
-	}, [binary]);
+		fileType && file && fetchData();
+	}, [file, fileType]);
 
 	return (
 		<div className='postModal'>
@@ -96,12 +96,8 @@ export const CreateModal = ({ modalControl }) => {
 				open={modalControl.open}
 				className='postModalDialog'
 			>
-				<img
-					src='https://asd-internship.fra1.digitaloceanspaces.com/61b30fecb3c6b295decc0a2b.A9CF0ehMQMcwuJ2gEOP7S.png'
-					alt=''
-				/>
-				{file?.fileLink ? (
-					<CreateFile src={file.fileLink} />
+				{fileLink ? (
+					<CreateFile src={fileLink} />
 				) : (
 					<PickFile>
 						<input

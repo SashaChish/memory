@@ -3,9 +3,11 @@ const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const auth = require('../../middleware/auth.js');
 const { nanoid } = require('nanoid');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+const fs = require('fs');
 
 const aws = require('aws-sdk');
-const fs = require('fs');
 const path = require('path');
 
 //Set S3 endpoint to DigitalOcean Spaces
@@ -33,7 +35,7 @@ router.post('/host/:type', auth, async (req, res) => {
 		stream.on('close', () => {
 			// Send a success response back to the client
 			const file = fs.readFileSync(filePath);
-
+			console.log(file);
 			const params = {
 				Bucket: 'asd-internship',
 				Key: `${req.user.id}.${fileId}.${req.params.type}`,
