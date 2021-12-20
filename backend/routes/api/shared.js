@@ -16,22 +16,17 @@ const s3 = new aws.S3({
 	secretAccessKey: 'y+AyQP3kOZM2wuFW/eKq+gn0Iedyy4L55wkqKhuoH+A',
 });
 
-// function getExtension(filename) {
-//     var ext = path.extname(filename||'').split('.');
-//     return ext[ext.length - 1];
-// }
-
 //@route	POST api/shared/host
 //@desc		Host file for post
 //@access	Private
-router.post('/host', auth, async (req, res) => {
+router.post('/host/:type', auth, async (req, res) => {
 	try {
+		console.log(req);
 		const filePath = path.join(
 			__dirname + '\\temporaryFileStorage',
-			`file.img`
+			`file.${req.params.type}`
 		);
 		const stream = fs.createWriteStream(filePath);
-		console.log(stream);
 		stream.on('open', () => req.pipe(stream));
 		const fileId = nanoid();
 
@@ -41,7 +36,7 @@ router.post('/host', auth, async (req, res) => {
 
 			const params = {
 				Bucket: 'asd-internship',
-				Key: `${req.user.id}.${fileId}.mp4`,
+				Key: `${req.user.id}.${fileId}.${req.params.type}`,
 				Body: file,
 				ACL: 'public-read',
 			};
@@ -54,7 +49,7 @@ router.post('/host', auth, async (req, res) => {
 
 			const url = s3.getSignedUrl('getObject', {
 				Bucket: 'asd-internship',
-				Key: `${req.user.id}.${fileId}.mp4`,
+				Key: `${req.user.id}.${fileId}.${req.params.type}`,
 			});
 			res.send(url.substring(0, url.indexOf('?')));
 		});

@@ -38,7 +38,7 @@ export const Explore = () => {
 				<Photos>
 					{posts.map((post) => (
 						<Div key={post._id} onClick={() => handleOpenPost(post._id)}>
-							<Image src={post.picture}></Image>
+							<Image src={post?.file?.fileLink}></Image>
 							<Info>
 								<Ul>
 									<Li style={{ marginRight: '30px' }}>
@@ -55,7 +55,7 @@ export const Explore = () => {
 					))}
 					{posts.map((post) => (
 						<Div key={post._id} onClick={() => handleOpenPost(post._id)}>
-							<Image src={post.picture}></Image>
+							<Image src={post?.file?.fileLink}></Image>
 							<Info>
 								<Ul>
 									<Li style={{ marginRight: '30px' }}>
@@ -72,7 +72,7 @@ export const Explore = () => {
 					))}
 					{posts.map((post) => (
 						<Div key={post._id} onClick={() => handleOpenPost(post._id)}>
-							<Image src={post.picture}></Image>
+							<Image src={post?.file?.fileLink}></Image>
 							<Info>
 								<Ul>
 									<Li style={{ marginRight: '30px' }}>
