@@ -4,9 +4,14 @@ export const CreateInfo = styled.div`
 	width: 40%;
 	max-height: 100%;
 	overflow: hidden;
+	border-left: 1px solid #968d8d;
 
 	.postComments {
 		height: calc(100% - 65px - 77px - 75px);
+	}
+
+	#outbox-close {
+		font-size: 30px;
 	}
 
 	@media (max-width: 1024px) {
@@ -26,6 +31,7 @@ export const CreateInfo = styled.div`
 
 	@media (max-width: 426px) {
 		width: 100%;
+		overflow: unset;
 
 		.postComments {
 			display: none;
@@ -37,8 +43,7 @@ export const CreateInfo = styled.div`
 		}
 
 		.postForm {
-			display: none;
-			position: absolute;
+			position: unset;
 			bottom: 0;
 			background-color: #fff;
 			width: inherit;
@@ -53,14 +58,10 @@ export const CreateInfo = styled.div`
 `;
 
 export const CreateFile = styled.img`
-	width: 60%;
+	width: 100%;
 	object-fit: contain;
 	background: #000;
-
-	@media (max-width: 426px) {
-		width: 100%;
-		height: 85vh;
-	}
+	height: 100%;
 `;
 
 export const CreateUsername = styled.span`
@@ -81,9 +82,9 @@ export const CreateUsername = styled.span`
 export const CreateForm = styled.form`
 	display: flex;
 	width: 100%;
-	height: 60px;
 	align-items: center;
 	padding: 0 12px;
+	flex-direction: column;
 
 	> div {
 		margin-top: 10px;
@@ -101,7 +102,7 @@ export const CreateForm = styled.form`
 	}
 
 	@media (max-width: 426px) {
-		height: 35px;
+		height: auto;
 		padding: 0 12px;
 	}
 `;
@@ -110,6 +111,11 @@ export const PickFile = styled.div`
 	display: grid;
 	place-items: center;
 	width: 60%;
+
+	@media (max-width: 426px) {
+		width: 100%;
+		height: 75vh;
+	}
 `;
 
 export const PickBtn = styled.button`
@@ -125,4 +131,24 @@ export const PickBtn = styled.button`
 	&:active {
 		background-color: #33acfc;
 	}
+
+	@media (max-width: 426px) {
+		font-size: 15px;
+	}
+`;
+
+export const CreateImgContainer = styled.div`
+	position: relative;
+	width: 60%;
+	height: 75vh;
+
+	@media (max-width: 426px) {
+		width: 100%;
+		min-height: 82vh;
+	}
+`;
+
+export const CreateVideo = styled.video`
+	width: 100%;
+	height: inherit;
 `;

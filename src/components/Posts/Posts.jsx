@@ -27,11 +27,11 @@ export const Posts = ({ handleUpdateHover, type, files }) => {
 				<PostsContainer>
 					{files.map((file) => (
 						<PostItem key={file._id} onClick={() => handleOpenPost(file._id)}>
-							{file?.file?.fileType === 'img' ? (
-								<img src={file?.file?.fileLink} alt={type} />
-							) : (
+							{/* {file?.file?.fileType === 'png' ? ( */}
+							<img src={file?.file?.fileLink} alt={type} />
+							{/* ) : (
 								<video src={file?.file?.fileLink}></video>
-							)}
+							)} */}
 							<PostLinks>
 								<span>
 									<FavoriteIcon /> {file.likes}
