@@ -37,7 +37,7 @@ router.get('/posts/:username', auth, async (req, res) => {
 			.lean();
 		const postsFinally = profilePosts.map((post) => ({
 			_id: post._id,
-			picture: post.picture,
+			file: post.file,
 			likes: post.likes.length,
 			comments: post.comments.length,
 		}));
@@ -61,7 +61,7 @@ router.get('/saved/me', auth, async (req, res) => {
 			)
 			.map((post) => ({
 				_id: post._id,
-				picture: post.picture,
+				file: post.file,
 				likes: post.likes.length,
 				comments: post.comments.length,
 			}));

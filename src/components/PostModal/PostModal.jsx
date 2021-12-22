@@ -162,7 +162,7 @@ export const PostModal = ({ handleUpdateHover, modalControl, postId }) => {
 				className='postModalDialog'
 			>
 				<PostImg
-					src={postInfo?.picture}
+					src={postInfo?.file?.fileLink}
 					alt={`${postInfo?.username}'s picture`}
 				/>
 

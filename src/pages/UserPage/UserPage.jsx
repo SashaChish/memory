@@ -187,7 +187,7 @@ export const UserPage = () => {
 								<Posts
 									handleUpdateHover={handleUpdateHover}
 									type='post'
-									imgs={profilePosts}
+									files={profilePosts}
 								/>
 							}
 						/>
@@ -198,7 +198,7 @@ export const UserPage = () => {
 									<Posts
 										handleUpdateHover={handleUpdateHover}
 										type='saved'
-										imgs={profileSaved}
+										files={profileSaved}
 									/>
 								)
 							}

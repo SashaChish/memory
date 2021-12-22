@@ -11,6 +11,7 @@ export const PostsContainer = styled.div`
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 30px;
+	grid-auto-rows: 1fr;
 
 	img {
 		max-width: 100%;
