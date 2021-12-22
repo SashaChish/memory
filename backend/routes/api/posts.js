@@ -314,4 +314,47 @@ router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
 	}
 });
 
+//@route	GET api/posts/you-following/:username
+//@desc		Return posts of users that you follow, sorted by date
+//@access	Private
+router.get('/you-following/:username', auth, async (req, res) => {
+	try {
+		const profile = await Profile.findOne({ username: req.params.username });
+		let postsIds = await Promise.all(
+			profile.following.map(async (follow) => {
+				const followProfile = await Profile.findOne({ user: follow.user });
+				return followProfile.posts;
+			})
+		);
+		postsIds = postsIds.reduce((prev, next) => prev.concat(next));
+
+		let posts = await Promise.all(
+			postsIds.map(async (postId) => await Post.findById(postId.post).lean())
+		);
+
+		//adding my own posts
+		posts.map((post) => posts.push(post));
+
+		//removing unvalid posts
+		posts = posts.filter((elem) => elem != null);
+
+		//removing duplicates
+		for (let i = 0; i < posts.length - 1; i++) {
+			for (let j = i + 1; j < posts.length; j++) {
+				if (posts[i]._id == posts[j]._id) {
+					posts.splice(j, 1);
+				}
+			}
+		}
+
+		//sorting by dates
+		posts = posts.sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+
+		res.json(posts);
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).send('Server Error!');
+	}
+});
+
 module.exports = router;
