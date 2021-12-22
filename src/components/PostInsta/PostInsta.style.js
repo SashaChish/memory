@@ -1,8 +1,10 @@
 import styled from 'styled-components';
 
 export const HomePage = styled.div`
-	max-width: 600px;
+	max-width: 800px;
 	margin: 100px auto;
+	display: flex;
+	justify-content: space-between;
 `;
 export const PostInstagram = styled.div`
 	border: 1px solid #f1f1f1;
@@ -73,3 +75,18 @@ export const PTime = styled.div`
 	color: #a2a2a2;
 	margin-top: 10px;
 `;
+
+export const Posts = styled.div`
+	max-width: 600px;
+`;
+export const ProfileInfo = styled.div`
+	margin-left: 20px;
+`;
+export const Profile = styled.div`
+	display: flex;
+	align-items: center;
+`;
+export const ProfileAvatar = styled.div``;
+export const ProfileText = styled.div``;
+export const Name = styled.div``;
+export const ProfileLink = styled.a``;
