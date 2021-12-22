@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const { check, validationResult } = require('express-validator');
+const auth = require('../../middleware/auth');
 
 const User = require('../../models/User.js');
 const Profile = require('../../models/Profile.js');
@@ -97,19 +98,32 @@ router.post(
 //@route	Post api/users/search
 //@desc		Search users by their username
 //@access	Private
-// router.post('/search', [auth, [check('searchText', 'Search text is required!').not().isEmpty()]], async (req,res) => {
-// 	const errors = validationResult(req);
+router.post(
+	'/search',
+	[auth, [check('searchText', 'Search text is required!').not().isEmpty()]],
+	async (req, res) => {
+		const errors = validationResult(req);
 
-// 	if(!errors.isEmpty()){
-// 		return res.status(400).json({errors: errors.array()});
-// 	}
+		if (!errors.isEmpty()) {
+			return res.status(400).json({ errors: errors.array() });
+		}
 
-// 	try{
-// 		//devide by space and check separately
-// 	}catch(err){
-// 		console.error(err.message);
-// 		res.status(500).send('Server error')
-// 	}
-// });
+		try {
+			//devide by space and check separately
+			const searchTexts = req.body.searchText.split(' ');
+			const users = await User.find().lean();
+			const searchedUsers = users.filter((user) => {
+				const finded = searchTexts.filter((searchText) =>
+					user.username.toLowerCase().includes(searchText.toLowerCase())
+				);
+				return finded.length > 0 ? true : false;
+			});
+			res.json(searchedUsers);
+		} catch (err) {
+			console.error(err.message);
+			res.status(500).send('Server error');
+		}
+	}
+);
 
 module.exports = router;
