@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const HomePage = styled.div`
 	max-width: 800px;
-	margin: 100px auto;
+	margin: 20px auto;
 	display: flex;
 	justify-content: space-between;
 `;
@@ -90,3 +90,8 @@ export const ProfileAvatar = styled.div``;
 export const ProfileText = styled.div``;
 export const Name = styled.div``;
 export const ProfileLink = styled.a``;
+export const RedirectText = styled.a`
+	cursor: pointer;
+	color: blue;
+	margin-left: 50px;
+`;

@@ -21,7 +21,10 @@ export default function App() {
 					element={userData._id ? [<Header />, <UserPage />] : <LogPage />}
 				/>
 				<Route exact path='/profile' />
-				<Route path='/' element={<PostInsta />} />
+				<Route
+					path='/'
+					element={userData._id ? [<Header />, <PostInsta />] : <LogPage />}
+				/>
 				<Route
 					path='/explore'
 					element={userData._id ? [<Header />, <Explore />] : <LogPage />}
