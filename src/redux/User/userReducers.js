@@ -1,4 +1,4 @@
-import { SET_USER } from '../actionTypes';
+import { SET_USER, SET_AVATAR } from '../actionTypes';
 
 const initState = {
 	_id: '',
@@ -15,8 +15,9 @@ const initState = {
 export const userReducer = (state = initState, action) => {
 	switch (action.type) {
 		case SET_USER:
-			console.log({ ...state, ...action.payload });
 			return { ...state, ...action.payload };
+		case SET_AVATAR:
+			return { ...state, avatar: action.payload.link };
 		default:
 			return state;
 	}
