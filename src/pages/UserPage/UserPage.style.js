@@ -251,7 +251,7 @@ export const Navigation = styled.div`
 		border-top: 1px solid transparent;
 	}
 
-	a:focus {
+	a.active {
 		border-top: 1px solid #000000;
 	}
 

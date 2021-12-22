@@ -1,9 +1,8 @@
 const express = require('express');
 const connectDB = require('./config/db.js');
+const cors = require('cors');
 
 const app = express();
-
-var cors = require('cors');
 
 // use it before all route definitions
 app.use(cors());
@@ -15,6 +14,7 @@ connectDB();
 app.use(express.json({ extended: false }));
 
 //Define Routes
+app.use('/api/shared', require('./routes/api/shared.js'));
 app.use('/api/users', require('./routes/api/users.js'));
 app.use('/api/auth', require('./routes/api/auth.js'));
 app.use('/api/posts', require('./routes/api/posts.js'));

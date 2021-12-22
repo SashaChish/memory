@@ -1,14 +1,20 @@
-import { Link, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, Routes, Route, useParams, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AppsIcon from '@mui/icons-material/Apps';
 import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';
+import { $api } from '../../http';
 
 import { useModal } from '../../hooks/useModal';
 
 import { Posts } from '../../components/Posts';
 import { Modal } from '../../components/Modal';
+import { NotFoundPage } from '../NotFoundPage';
 import { AvatarModal } from '../../components/AvatarModal';
 import { SettingsModal } from '../../components/SettingsModal';
+
+import { transformError } from '../../helpers';
 
 import {
 	Main,
@@ -35,8 +41,55 @@ import {
 export const UserPage = () => {
 	const avatar = useModal();
 	const settings = useModal();
+	const { username } = useParams();
+	const location = useLocation();
+	const [profileInfo, setProfileInfo] = useState({});
+	const [profilePosts, setProfilePosts] = useState([]);
+	const [profileSaved, setProfileSaved] = useState([]);
+	const [usersProfile, setUsersProfile] = useState(false);
+	const userData = useSelector((state) => state);
+	const [notFoundError, setNotFoundError] = useState(false);
 
-	return (
+	useEffect(() => {
+		async function fetchData() {
+			setUsersProfile(username === userData.username);
+
+			try {
+				const profile = await $api.get(`/profile/${username}`);
+				setProfileInfo(profile.data);
+			} catch (err) {
+				err = transformError(err);
+				if (err.status === 404) {
+					setNotFoundError(true);
+				}
+			}
+
+			const posts = await $api.get(`/profile/posts/${username}`);
+			const saved = await $api.get(`/profile/saved/me`);
+
+			posts.status === 200 && setProfilePosts(posts.data);
+			saved.status === 200 &&
+				username === userData.username &&
+				setProfileSaved(saved.data);
+		}
+
+		fetchData();
+	}, [location]);
+
+	const handleUpdateHover = async () => {
+		try {
+			const posts = await $api.get(`/profile/posts/${username}`);
+			console.log(posts);
+			setProfilePosts(posts.data);
+
+			const saved = await $api.get(`/profile/saved/me`);
+			setProfileSaved(saved.data);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
+	return !notFoundError ? (
 		<PageWrapper>
 			<Main>
 				<ContentContainer>
@@ -45,7 +98,7 @@ export const UserPage = () => {
 							<div>
 								<AvatarContainer>
 									<button onClick={avatar.handleOpenModal}>
-										<Avatar src='https://cdn.pixabay.com/photo/2021/11/11/20/49/sauerland-6787215_960_720.jpg' />
+										<Avatar src={profileInfo?.avatar} />
 									</button>
 									<Modal modalControl={avatar}>
 										<AvatarModal modalControl={avatar} />
@@ -55,7 +108,7 @@ export const UserPage = () => {
 						</AvatarWrapper>
 						<UserInfoContainer>
 							<UsernameBlock>
-								<h2>Username</h2>
+								<h2>{profileInfo?.username}</h2>
 								<BtnWrapper>
 									<BtnEdit>Edit Profile</BtnEdit>
 								</BtnWrapper>
@@ -71,50 +124,60 @@ export const UserPage = () => {
 							</UsernameBlock>
 							<ul>
 								<li>
-									<span>9 posts</span>
+									<span>{profileInfo?.posts?.length} posts</span>
 								</li>
 								<li>
-									<span>165 followers</span>
+									<span>{profileInfo?.followers?.length} followers</span>
 								</li>
 								<li>
-									<span>118 following</span>
+									<span>{profileInfo?.following?.length} following</span>
 								</li>
 							</ul>
 							<FullNameBlock>
-								<h1>Full name</h1>
+								<h1>{profileInfo?.fullName}</h1>
 							</FullNameBlock>
 						</UserInfoContainer>
 					</ContentHeader>
 					<TitleMobile>
-						<h1>Full name</h1>
+						<h1>{profileInfo?.fullName}</h1>
 					</TitleMobile>
 					<UlMobile>
 						<li>
-							<span>9</span>
+							<span>{profileInfo?.posts?.length}</span>
 							<span>posts</span>
 						</li>
 						<li>
-							<span>165</span>
+							<span>{profileInfo?.followers?.length}</span>
 							<span>followers</span>
 						</li>
 						<li>
-							<span>118</span>
+							<span>{profileInfo?.following?.length}</span>
 							<span>following</span>
 						</li>
 					</UlMobile>
 					<Navigation>
-						<Link to='/username/'>
+						<Link
+							to={`/${username}`}
+							className={location.pathname === `/${username}` ? 'active' : ''}
+						>
 							<span>
 								<AppsIcon />
 								<span>Posts</span>
 							</span>
 						</Link>
-						<Link to='/username/saved/'>
-							<span>
-								<BookmarkBorderOutlinedIcon />
-								<span>Saved</span>
-							</span>
-						</Link>
+						{usersProfile && (
+							<Link
+								to={`/${username}/saved`}
+								className={
+									location.pathname === `/${username}/saved` ? 'active' : ''
+								}
+							>
+								<span>
+									<BookmarkBorderOutlinedIcon />
+									<span>Saved</span>
+								</span>
+							</Link>
+						)}
 					</Navigation>
 
 					<Routes>
@@ -122,23 +185,29 @@ export const UserPage = () => {
 							path='/'
 							element={
 								<Posts
-									text='post'
-									src='https://cdn.pixabay.com/photo/2021/11/11/20/49/sauerland-6787215_960_720.jpg'
+									handleUpdateHover={handleUpdateHover}
+									type='post'
+									files={profilePosts}
 								/>
 							}
 						/>
 						<Route
-							path='saved'
+							path='/saved/'
 							element={
-								<Posts
-									text='saved'
-									src='https://media.istockphoto.com/photos/snow-covered-christmas-tree-plantation-picture-id1295331937?b=1&k=20&m=1295331937&s=170667a&w=0&h=owYa_ihglG6FIaR5CNqIPFQ6IQFr0EYDXo2IgqhvIKA='
-								/>
+								usersProfile && (
+									<Posts
+										handleUpdateHover={handleUpdateHover}
+										type='saved'
+										files={profileSaved}
+									/>
+								)
 							}
 						/>
 					</Routes>
 				</ContentContainer>
 			</Main>
 		</PageWrapper>
+	) : (
+		<NotFoundPage />
 	);
 };

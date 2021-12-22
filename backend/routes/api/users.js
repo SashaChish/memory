@@ -63,6 +63,7 @@ router.post(
 					user: room.id,
 					avatar: room.avatar,
 					username: username,
+					fullName: room.fullName,
 				});
 
 				profile.save();
@@ -92,5 +93,23 @@ router.post(
 		}
 	}
 );
+
+//@route	Post api/users/search
+//@desc		Search users by their username
+//@access	Private
+// router.post('/search', [auth, [check('searchText', 'Search text is required!').not().isEmpty()]], async (req,res) => {
+// 	const errors = validationResult(req);
+
+// 	if(!errors.isEmpty()){
+// 		return res.status(400).json({errors: errors.array()});
+// 	}
+
+// 	try{
+// 		//devide by space and check separately
+// 	}catch(err){
+// 		console.error(err.message);
+// 		res.status(500).send('Server error')
+// 	}
+// });
 
 module.exports = router;

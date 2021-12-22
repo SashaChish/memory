@@ -13,7 +13,7 @@ export const Explore = () => {
 	useEffect(async () => {
 		const posts = await $api.get(`/posts`);
 		posts.status === 200 && setPosts(posts.data);
-	});
+	}, []);
 
 	const postControl = useModal();
 	const [postId, setPostId] = useState('');
@@ -23,21 +23,64 @@ export const Explore = () => {
 		postControl.handleOpenModal();
 	};
 
+	const handleUpdateHover = async () => {
+		try {
+			const posts = await $api.get(`/posts`);
+			setPosts(posts.data);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
 	return (
 		<>
 			<Wrapper>
 				<Photos>
 					{posts.map((post) => (
 						<Div key={post._id} onClick={() => handleOpenPost(post._id)}>
-							<Image src={post.avatar}></Image>
+							<Image src={post?.file?.fileLink}></Image>
 							<Info>
 								<Ul>
-									<Li>
-										<FavoriteIcon />
+									<Li style={{ marginRight: '30px' }}>
+										<FavoriteIcon style={{ marginRight: '10px' }} />
 										{post.likes.length}
 									</Li>
 									<Li>
-										<ModeCommentIcon />
+										<ModeCommentIcon style={{ marginRight: '10px' }} />
+										{post.comments.length}
+									</Li>
+								</Ul>
+							</Info>
+						</Div>
+					))}
+					{posts.map((post) => (
+						<Div key={post._id} onClick={() => handleOpenPost(post._id)}>
+							<Image src={post?.file?.fileLink}></Image>
+							<Info>
+								<Ul>
+									<Li style={{ marginRight: '30px' }}>
+										<FavoriteIcon style={{ marginRight: '10px' }} />
+										{post.likes.length}
+									</Li>
+									<Li>
+										<ModeCommentIcon style={{ marginRight: '10px' }} />
+										{post.comments.length}
+									</Li>
+								</Ul>
+							</Info>
+						</Div>
+					))}
+					{posts.map((post) => (
+						<Div key={post._id} onClick={() => handleOpenPost(post._id)}>
+							<Image src={post?.file?.fileLink}></Image>
+							<Info>
+								<Ul>
+									<Li style={{ marginRight: '30px' }}>
+										<FavoriteIcon style={{ marginRight: '10px' }} />
+										{post.likes.length}
+									</Li>
+									<Li>
+										<ModeCommentIcon style={{ marginRight: '10px' }} />
 										{post.comments.length}
 									</Li>
 								</Ul>
@@ -46,7 +89,11 @@ export const Explore = () => {
 					))}
 				</Photos>
 			</Wrapper>
-			<PostModal modalControl={postControl} postId={postId} />
+			<PostModal
+				handleUpdateHover={handleUpdateHover}
+				modalControl={postControl}
+				postId={postId}
+			/>
 		</>
 	);
 };

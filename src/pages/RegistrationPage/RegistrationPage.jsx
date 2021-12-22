@@ -3,7 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { useEffect, useState } from 'react';
 
-import { registration } from '../../services';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/User/userActions';
+
+import { registration, userInfo } from '../../services';
 import { useInput } from '../../hooks';
 
 import { Input } from '../../components/Input';
@@ -31,6 +34,7 @@ export const RegistrationPage = () => {
 	const [isExistEmail, setExistEmail] = useState(false);
 	const [isExistUsername, setExistUsername] = useState(false);
 	const [errorMessage, setErrorMessage] = useState('');
+	const dispatch = useDispatch();
 	const email = useInput('', { isEmpty: true, isEmail: true });
 	const fullName = useInput('', { isEmpty: true, minLength: 6, maxLength: 50 });
 	const password = useInput('', {
@@ -70,6 +74,10 @@ export const RegistrationPage = () => {
 			});
 
 			localStorage.setItem('x-auth-token', res.data.token);
+
+			const userData = await userInfo();
+			dispatch(setUser(userData.data));
+
 			navigate(`/${username.value}`);
 		} catch (e) {
 			console.log(e);

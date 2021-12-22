@@ -14,17 +14,11 @@ const Profile = require('../../models/Profile.js');
 //@access   Public
 router.get('/', auth, async (req, res) => {
 	try {
-		const user = await User.findById(req.user.id).select('-password').lean();
-		const profile = await Profile.findOne({ user: req.user.id }).lean();
-		const finalResponse = {
-			...user,
-			posts: profile.posts,
-			followers: profile.followers,
-			following: profile.following,
-			saved: profile.saved,
-		};
+		const profile = await Profile.findOne({ user: req.user.id })
+			.select('-__v -_id -user')
+			.lean();
 
-		res.json(finalResponse);
+		res.json({ _id: req.user.id, ...profile });
 	} catch (err) {
 		console.log(err.message);
 		res.status(500).send('Server Error');

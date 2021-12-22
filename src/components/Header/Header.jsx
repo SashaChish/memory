@@ -1,5 +1,6 @@
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
+import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -26,10 +27,20 @@ import {
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 
+import { useModal } from '../../hooks/useModal';
+
+import { Link } from 'react-router-dom';
+
+import { useSelector } from 'react-redux';
+
+import { CreateModal } from '../CreateModal';
+
 export const Header = () => {
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 	const [open, setOpen] = React.useState(false);
+	const userData = useSelector((state) => state);
+	const createControl = useModal();
 
 	const isMenuOpen = Boolean(anchorEl);
 	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -69,8 +80,23 @@ export const Header = () => {
 			open={isMenuOpen}
 			onClose={handleMenuClose}
 		>
-			<MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-			<MenuItem onClick={handleMenuClose}>LogOut</MenuItem>
+			<MenuItem onClick={handleMenuClose}>
+				<Link
+					to={`/${userData?.username}`}
+					style={{ textDecoration: 'none', color: '#000' }}
+				>
+					Profile
+				</Link>
+			</MenuItem>
+			<MenuItem onClick={handleMenuClose}>
+				<Link
+					to='/login'
+					style={{ textDecoration: 'none', color: '#000' }}
+					onClick={() => localStorage.clear()}
+				>
+					LogOut
+				</Link>
+			</MenuItem>
 		</Menu>
 	);
 
@@ -103,136 +129,195 @@ export const Header = () => {
 			onClose={handleMobileMenuClose}
 		>
 			<MenuItem>
-				<IconButton size='small'>Home</IconButton>
-			</MenuItem>
-			<MenuItem>
-				<IconButton size='small'>Add Photo</IconButton>
-			</MenuItem>
-			<MenuItem>
-				<IconButton size='small'>History</IconButton>
-			</MenuItem>
-			<MenuItem>
-				<IconButton size='small'>Like</IconButton>
-			</MenuItem>
-			<MenuItem onClick={handleProfileMenuOpen}>
-				<IconButton
-					size='small'
-					edge='end'
-					aria-label='account of current user'
-					aria-controls={menuId}
-					aria-haspopup='true'
-					onClick={handleProfileMenuOpen}
+				<Link
+					to='/'
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						textDecoration: 'none',
+						color: 'rgba(0, 0, 0, 0.54)',
+					}}
 				>
-					Profile
-				</IconButton>
+					Home
+				</Link>
+			</MenuItem>
+
+			<MenuItem
+				style={{ color: 'rgba(0, 0, 0, 0.54)' }}
+				onClick={() => createControl.handleOpenModal()}
+			>
+				Add Photo
 			</MenuItem>
 			<MenuItem>
-				<IconButton size='small'>LogOut</IconButton>
+				<Link
+					to='/explore'
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						textDecoration: 'none',
+						color: 'rgba(0, 0, 0, 0.54)',
+					}}
+				>
+					History
+				</Link>
+			</MenuItem>
+
+			<MenuItem style={{ color: 'rgba(0, 0, 0, 0.54)' }}>Like</MenuItem>
+			<MenuItem
+				onClick={handleProfileMenuOpen}
+				style={{ color: 'rgba(0, 0, 0, 0.54)' }}
+			>
+				Profile
+			</MenuItem>
+			<MenuItem>
+				<Link
+					to='/login'
+					style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.54)' }}
+					onClick={() => localStorage.clear()}
+				>
+					LogOut
+				</Link>
 			</MenuItem>
 		</Menu>
 	);
 
 	return (
-		<Box sx={{ flexGrow: 1 }}>
-			<AppBar sx={{ backgroundColor: '#fff', color: '#000' }}>
-				<Toolbar sx={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-					<Typography
-						variant='h6'
-						noWrap
-						component='div'
-						sx={{ display: { xs: 'none', sm: 'block' }, color: 'black' }}
-					>
-						Memory
-					</Typography>
-					<Search onClick={handleClickOpen}>
-						<SearchIconWrapper>
-							<SearchIcon />
-						</SearchIconWrapper>
-						<StyledInputBase
-							placeholder='Search'
-							inputProps={{ 'aria-label': 'search' }}
-						/>
-						<Dialog
-							onClose={handleClose}
-							sx={{ display: open ? 'block' : 'none' }}
-						>
-							<List>
-								<ListItem>
-									<ListItemAvatar>
-										<Img src='https://picsum.photos/200/300' />
-									</ListItemAvatar>
-									<ListItemText>
-										<Name>Test Name</Name>
-									</ListItemText>
-								</ListItem>
-								<ListItem>
-									<ListItemAvatar>
-										<Img src='https://picsum.photos/200/300' />
-									</ListItemAvatar>
-									<ListItemText>
-										<Name>Test Name</Name>
-									</ListItemText>
-								</ListItem>
-								<ListItem>
-									<ListItemAvatar>
-										<Img src='https://picsum.photos/200/300' />
-									</ListItemAvatar>
-									<ListItemText>
-										<Name>Test Name</Name>
-									</ListItemText>
-								</ListItem>
-								<ListItem>
-									<ListItemAvatar>
-										<Img src='https://picsum.photos/200/300' />
-									</ListItemAvatar>
-									<ListItemText>
-										<Name>Test Name</Name>
-									</ListItemText>
-								</ListItem>
-							</List>
-						</Dialog>
-					</Search>
-					<Box sx={{ flexGrow: 1 }} />
-					<Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-						<IconButton sx={{ color: 'black' }}>
-							<HomeOutlinedIcon />
-						</IconButton>
-						<IconButton sx={{ color: 'black' }}>
-							<AddBoxOutlinedIcon />
-						</IconButton>
-						<IconButton sx={{ color: 'black' }}>
-							<ExploreOutlinedIcon />
-						</IconButton>
-						<IconButton sx={{ color: 'black' }}>
-							<FavoriteBorderRoundedIcon />
-						</IconButton>
-						<IconButton
-							size='large'
-							edge='end'
-							aria-label='account of current user'
-							aria-controls={menuId}
-							aria-haspopup='true'
-							onClick={handleProfileMenuOpen}
-							sx={{ color: 'black' }}
-						>
-							<AccountCircle />
-						</IconButton>
-					</Box>
-					<Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-						<IconButton
-							size='large'
-							aria-label='show more'
-							aria-controls={mobileMenuId}
-							aria-haspopup='true'
-							onClick={handleMobileMenuOpen}
-						>
-							<MoreIcon />
-						</IconButton>
-					</Box>
-				</Toolbar>
-			</AppBar>
-			{renderMobileMenu}
-			{renderMenu}
-		</Box>
+		<>
+			<Box sx={{ flexGrow: 1, paddingTop: '64px' }}>
+				<AppBar sx={{ backgroundColor: '#fff', color: '#000' }}>
+					<Toolbar sx={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+						<Link to='/' style={{ textDecoration: 'none' }}>
+							<Typography
+								variant='h6'
+								noWrap
+								component='div'
+								sx={{ display: { xs: 'none', sm: 'block' }, color: 'black' }}
+							>
+								Memory
+							</Typography>
+						</Link>
+						<Search onClick={handleClickOpen}>
+							<SearchIconWrapper>
+								<SearchIcon />
+							</SearchIconWrapper>
+							<StyledInputBase
+								placeholder='Search'
+								inputProps={{ 'aria-label': 'search' }}
+							/>
+							<Dialog
+								onClose={handleClose}
+								sx={{ display: open ? 'block' : 'none' }}
+							>
+								<List>
+									<ListItem>
+										<ListItemAvatar>
+											<Img src='https://picsum.photos/200/300' />
+										</ListItemAvatar>
+										<ListItemText>
+											<Name>Test Name</Name>
+										</ListItemText>
+									</ListItem>
+									<ListItem>
+										<ListItemAvatar>
+											<Img src='https://picsum.photos/200/300' />
+										</ListItemAvatar>
+										<ListItemText>
+											<Name>Test Name</Name>
+										</ListItemText>
+									</ListItem>
+									<ListItem>
+										<ListItemAvatar>
+											<Img src='https://picsum.photos/200/300' />
+										</ListItemAvatar>
+										<ListItemText>
+											<Name>Test Name</Name>
+										</ListItemText>
+									</ListItem>
+									<ListItem>
+										<ListItemAvatar>
+											<Img src='https://picsum.photos/200/300' />
+										</ListItemAvatar>
+										<ListItemText>
+											<Name>Test Name</Name>
+										</ListItemText>
+									</ListItem>
+								</List>
+							</Dialog>
+						</Search>
+						<Box sx={{ flexGrow: 1 }} />
+						<Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+							<Link
+								to='/'
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									textDecoration: 'none',
+								}}
+							>
+								<IconButton sx={{ color: 'black' }}>
+									<HomeOutlinedIcon />
+								</IconButton>
+							</Link>
+
+							<IconButton
+								sx={{ color: 'black' }}
+								onClick={() => createControl.handleOpenModal()}
+							>
+								<AddBoxOutlinedIcon />
+							</IconButton>
+							<Link
+								to='/explore'
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									textDecoration: 'none',
+								}}
+							>
+								<IconButton sx={{ color: 'black' }}>
+									<ExploreOutlinedIcon />
+								</IconButton>
+							</Link>
+
+							<IconButton sx={{ color: 'black' }}>
+								<FavoriteBorderRoundedIcon />
+							</IconButton>
+							<IconButton
+								size='large'
+								edge='end'
+								aria-label='account of current user'
+								aria-controls={menuId}
+								aria-haspopup='true'
+								onClick={handleProfileMenuOpen}
+								sx={{ color: 'black' }}
+							>
+								{userData?.avatar ? (
+									<Avatar
+										sx={{ width: 24, height: 24 }}
+										alt={userData?.username}
+										src={userData?.avatar}
+									/>
+								) : (
+									<AccountCircle />
+								)}
+							</IconButton>
+						</Box>
+						<Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+							<IconButton
+								size='large'
+								aria-label='show more'
+								aria-controls={mobileMenuId}
+								aria-haspopup='true'
+								onClick={handleMobileMenuOpen}
+							>
+								<MoreIcon />
+							</IconButton>
+						</Box>
+					</Toolbar>
+				</AppBar>
+				{renderMobileMenu}
+				{renderMenu}
+			</Box>
+			<CreateModal modalControl={createControl} />
+		</>
 	);
 };
