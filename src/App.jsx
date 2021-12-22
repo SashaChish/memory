@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Explore } from './components/Explore/Explore';
 import { RegistrationPage, LogPage, UserPage } from './pages';
+import { PostInsta } from './components/PostInsta/PostInsta';
 
 import { Header } from './components/Header';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -20,6 +21,10 @@ export default function App() {
 					element={userData._id ? [<Header />, <UserPage />] : <LogPage />}
 				/>
 				<Route exact path='/profile' />
+				<Route
+					path='/'
+					element={userData._id ? [<Header />, <PostInsta />] : <LogPage />}
+				/>
 				<Route
 					path='/explore'
 					element={userData._id ? [<Header />, <Explore />] : <LogPage />}

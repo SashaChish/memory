@@ -12,7 +12,18 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import MoreIcon from '@mui/icons-material/MoreVert';
-import { Search, SearchIconWrapper, StyledInputBase } from './Header.style';
+import {
+	Search,
+	SearchIconWrapper,
+	StyledInputBase,
+	ListItemText,
+	ListItem,
+	List,
+	Dialog,
+	ListItemAvatar,
+	Name,
+	Img,
+} from './Header.style';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 
@@ -27,6 +38,7 @@ import { CreateModal } from '../CreateModal';
 export const Header = () => {
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+	const [open, setOpen] = React.useState(false);
 	const userData = useSelector((state) => state);
 	const createControl = useModal();
 
@@ -87,6 +99,16 @@ export const Header = () => {
 			</MenuItem>
 		</Menu>
 	);
+
+	const handleClickOpen = () => {
+		setOpen(true);
+		console.log(open);
+	};
+
+	const handleClose = () => {
+		setOpen(false);
+		console.log(open);
+	};
 
 	const mobileMenuId = 'primary-search-account-menu-mobile';
 	const renderMobileMenu = (
@@ -174,7 +196,7 @@ export const Header = () => {
 								Memory
 							</Typography>
 						</Link>
-						<Search>
+						<Search onClick={handleClickOpen}>
 							<SearchIconWrapper>
 								<SearchIcon />
 							</SearchIconWrapper>
@@ -182,6 +204,45 @@ export const Header = () => {
 								placeholder='Search'
 								inputProps={{ 'aria-label': 'search' }}
 							/>
+							<Dialog
+								onClose={handleClose}
+								sx={{ display: open ? 'block' : 'none' }}
+							>
+								<List>
+									<ListItem>
+										<ListItemAvatar>
+											<Img src='https://picsum.photos/200/300' />
+										</ListItemAvatar>
+										<ListItemText>
+											<Name>Test Name</Name>
+										</ListItemText>
+									</ListItem>
+									<ListItem>
+										<ListItemAvatar>
+											<Img src='https://picsum.photos/200/300' />
+										</ListItemAvatar>
+										<ListItemText>
+											<Name>Test Name</Name>
+										</ListItemText>
+									</ListItem>
+									<ListItem>
+										<ListItemAvatar>
+											<Img src='https://picsum.photos/200/300' />
+										</ListItemAvatar>
+										<ListItemText>
+											<Name>Test Name</Name>
+										</ListItemText>
+									</ListItem>
+									<ListItem>
+										<ListItemAvatar>
+											<Img src='https://picsum.photos/200/300' />
+										</ListItemAvatar>
+										<ListItemText>
+											<Name>Test Name</Name>
+										</ListItemText>
+									</ListItem>
+								</List>
+							</Dialog>
 						</Search>
 						<Box sx={{ flexGrow: 1 }} />
 						<Box sx={{ display: { xs: 'none', md: 'flex' } }}>
