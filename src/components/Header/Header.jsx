@@ -165,7 +165,6 @@ export const Header = () => {
 				</Link>
 			</MenuItem>
 
-			<MenuItem style={{ color: 'rgba(0, 0, 0, 0.54)' }}>Like</MenuItem>
 			<MenuItem
 				onClick={handleProfileMenuOpen}
 				style={{ color: 'rgba(0, 0, 0, 0.54)' }}
@@ -294,9 +293,6 @@ export const Header = () => {
 								</IconButton>
 							</Link>
 
-							<IconButton sx={{ color: 'black' }}>
-								<FavoriteBorderRoundedIcon />
-							</IconButton>
 							<IconButton
 								size='large'
 								edge='end'

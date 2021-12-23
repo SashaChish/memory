@@ -91,9 +91,17 @@ export const PTime = styled.div`
 
 export const Posts = styled.div`
 	max-width: 600px;
+
+	@media (max-width: 768px) {
+		margin: 0 auto;
+	}
 `;
 export const ProfileInfo = styled.div`
 	margin-left: 20px;
+
+	@media (max-width: 768px) {
+		display: none;
+	}
 `;
 export const Profile = styled.div`
 	display: flex;

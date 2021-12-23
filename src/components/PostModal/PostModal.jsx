@@ -210,6 +210,34 @@ export const PostModal = ({ handleUpdateHover, modalControl, postId }) => {
 							}`,
 						}}
 					>
+						<DialogComment>
+							<Link
+								to={`/${postInfo?.username}`}
+								style={{ textDecoration: 'none' }}
+							>
+								<Avatar
+									sx={{ width: 40, height: 40, marginRight: '20px' }}
+									alt={postInfo?.username}
+									src={postInfo?.avatar}
+								/>
+							</Link>
+							<Typography
+								gutterBottom
+								sx={{ position: 'relative', width: '100%' }}
+							>
+								<Link
+									to={`/${postInfo?.username}`}
+									style={{ textDecoration: 'none' }}
+								>
+									<PostUsername>{postInfo?.username}</PostUsername>
+								</Link>
+								{'  '}
+								{postInfo?.description}
+								<CommentDate>
+									<Moment fromNow>{new Date(postInfo?.date)}</Moment>
+								</CommentDate>
+							</Typography>
+						</DialogComment>
 						{postInfo?.comments?.map((comment) => (
 							<DialogComment key={nanoid()}>
 								<Link

@@ -11,6 +11,7 @@ import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import { useModal } from '../../hooks/useModal';
 import { PostModal } from '../PostModal';
+import { nanoid } from 'nanoid';
 
 import {
 	HomePage,
@@ -102,7 +103,7 @@ export const PostInsta = () => {
 			<HomePage>
 				<Posts>
 					{posts.map((post) => (
-						<PostInstagram key={post?._id}>
+						<PostInstagram key={nanoid()}>
 							<Card>
 								<Link to={`/${post?.username}`}>
 									<ImgTag src={post?.avatar} />
