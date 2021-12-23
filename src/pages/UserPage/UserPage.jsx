@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Routes, Route, useParams, useLocation } from 'react-router-dom';
+import {
+	Link,
+	Routes,
+	Route,
+	useParams,
+	useLocation,
+	useNavigate,
+} from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import SettingsIcon from '@mui/icons-material/Settings';
 import AppsIcon from '@mui/icons-material/Apps';
 import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';
 import { $api } from '../../http';
@@ -12,9 +18,11 @@ import { Posts } from '../../components/Posts';
 import { Modal } from '../../components/Modal';
 import { NotFoundPage } from '../NotFoundPage';
 import { AvatarModal } from '../../components/AvatarModal';
-import { SettingsModal } from '../../components/SettingsModal';
 
 import { transformError } from '../../helpers';
+
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/User/userActions';
 
 import {
 	Main,
@@ -25,12 +33,12 @@ import {
 	Avatar,
 	AvatarContainer,
 	AvatarWrapper,
-	BtnEdit,
+	BtnUnfollow,
+	BtnFollow,
 	BtnWrapper,
 	ContentContainer,
 	ContentHeader,
 	FullNameBlock,
-	IconContainer,
 	Navigation,
 	TitleMobile,
 	UlMobile,
@@ -40,15 +48,17 @@ import {
 
 export const UserPage = () => {
 	const avatar = useModal();
-	const settings = useModal();
 	const { username } = useParams();
 	const location = useLocation();
+	const navigate = useNavigate();
 	const [profileInfo, setProfileInfo] = useState({});
 	const [profilePosts, setProfilePosts] = useState([]);
 	const [profileSaved, setProfileSaved] = useState([]);
 	const [usersProfile, setUsersProfile] = useState(false);
 	const userData = useSelector((state) => state);
 	const [notFoundError, setNotFoundError] = useState(false);
+	const [following, setFollowing] = useState(false);
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		async function fetchData() {
@@ -57,6 +67,19 @@ export const UserPage = () => {
 			try {
 				const profile = await $api.get(`/profile/${username}`);
 				setProfileInfo(profile.data);
+				console.log(userData);
+				userData?.following.map((follow) => console.log(follow.user));
+				console.log(profile.data?.user);
+				setFollowing(
+					userData?.following.some(
+						(follow) => follow.user === profile.data?.user
+					)
+				);
+				console.log(
+					userData?.following.some(
+						(follow) => follow.user === profile.data?.user
+					)
+				);
 			} catch (err) {
 				err = transformError(err);
 				if (err.status === 404) {
@@ -89,6 +112,34 @@ export const UserPage = () => {
 		}
 	};
 
+	const handleFollow = async () => {
+		try {
+			await $api.post('/profile/following/add', {
+				id: profileInfo?.user,
+			});
+			const result = await $api.get('/auth');
+			dispatch(setUser(result.data));
+			setFollowing(true);
+			navigate(location.pathname);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
+	const handleUnfollow = async () => {
+		try {
+			await $api.post('/profile/following/remove', {
+				id: profileInfo?.user,
+			});
+			const result = await $api.get('/auth');
+			dispatch(setUser(result.data));
+			setFollowing(false);
+			navigate(location.pathname);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
 	return !notFoundError ? (
 		<PageWrapper>
 			<Main>
@@ -113,18 +164,19 @@ export const UserPage = () => {
 						<UserInfoContainer>
 							<UsernameBlock>
 								<h2>{profileInfo?.username}</h2>
-								<BtnWrapper>
-									<BtnEdit>Edit Profile</BtnEdit>
-								</BtnWrapper>
-								<IconContainer>
-									<SettingsIcon
-										onClick={settings.handleOpenModal}
-										fontSize='large'
-									/>
-									<Modal modalControl={settings}>
-										<SettingsModal modalControl={settings} />
-									</Modal>
-								</IconContainer>
+								{username !== userData?.username && (
+									<BtnWrapper>
+										{following ? (
+											<BtnUnfollow onClick={() => handleUnfollow()}>
+												Unfollow
+											</BtnUnfollow>
+										) : (
+											<BtnFollow onClick={() => handleFollow()}>
+												Follow
+											</BtnFollow>
+										)}
+									</BtnWrapper>
+								)}
 							</UsernameBlock>
 							<ul>
 								<li>
