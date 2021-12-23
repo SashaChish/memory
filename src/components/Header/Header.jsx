@@ -240,6 +240,7 @@ export const Header = () => {
 								<List>
 									{searchedData?.map((data) => (
 										<Link
+											key={data?._id}
 											to={`/${data?.username}`}
 											style={{ textDecoration: 'none', color: '#000' }}
 										>
