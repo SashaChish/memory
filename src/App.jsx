@@ -20,7 +20,6 @@ export default function App() {
 					path='/:username/*'
 					element={userData._id ? [<Header />, <UserPage />] : <LogPage />}
 				/>
-				<Route exact path='/profile' />
 				<Route
 					path='/'
 					element={userData._id ? [<Header />, <PostInsta />] : <LogPage />}

@@ -1,8 +1,13 @@
 import styled from 'styled-components';
 
+export const PostInstaContainer = styled.div`
+	background-color: #fafafa;
+	padding: 20px 0;
+`;
+
 export const HomePage = styled.div`
 	max-width: 800px;
-	margin: 20px auto;
+	margin: 0 auto;
 	display: flex;
 	justify-content: space-between;
 `;
@@ -10,6 +15,7 @@ export const PostInstagram = styled.div`
 	border: 1px solid #f1f1f1;
 	border-radius: 2px;
 	margin-bottom: 30px;
+	background: #fff;
 `;
 export const Card = styled.div`
 	padding: 10px;
