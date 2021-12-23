@@ -323,17 +323,27 @@ router.get('/you-following/:username', auth, async (req, res) => {
 		let postsIds = await Promise.all(
 			profile.following.map(async (follow) => {
 				const followProfile = await Profile.findOne({ user: follow.user });
-				return followProfile.posts;
+				return followProfile !== null ? followProfile.posts : followProfile;
 			})
 		);
-		postsIds = postsIds.reduce((prev, next) => prev.concat(next));
 
-		let posts = await Promise.all(
-			postsIds.map(async (postId) => await Post.findById(postId.post).lean())
-		);
+		//removing unvalid ids
+		postsIds = postsIds.filter((elem) => elem != null);
 
 		//adding my own posts
-		posts.map((post) => posts.push(post));
+		postsIds.push(profile.posts);
+
+		postsIds =
+			postsIds.length > 0 && postsIds.reduce((prev, next) => prev.concat(next));
+
+		let posts =
+			postsIds.length > 0
+				? await Promise.all(
+						postsIds.map(
+							async (postId) => await Post.findById(postId.post).lean()
+						)
+				  )
+				: [];
 
 		//removing unvalid posts
 		posts = posts.filter((elem) => elem != null);
@@ -348,7 +358,7 @@ router.get('/you-following/:username', auth, async (req, res) => {
 		}
 
 		//sorting by dates
-		posts = posts.sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+		posts = posts.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
 
 		res.json(posts);
 	} catch (err) {

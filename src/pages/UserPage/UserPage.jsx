@@ -97,9 +97,13 @@ export const UserPage = () => {
 						<AvatarWrapper>
 							<div>
 								<AvatarContainer>
-									<button onClick={avatar.handleOpenModal}>
+									{username === userData?.username ? (
+										<button onClick={avatar.handleOpenModal}>
+											<Avatar src={profileInfo?.avatar} />
+										</button>
+									) : (
 										<Avatar src={profileInfo?.avatar} />
-									</button>
+									)}
 									<Modal modalControl={avatar}>
 										<AvatarModal modalControl={avatar} />
 									</Modal>

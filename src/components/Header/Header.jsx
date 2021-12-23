@@ -23,6 +23,7 @@ import {
 	ListItemAvatar,
 	Name,
 	Img,
+	HeaderSearch,
 } from './Header.style';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
@@ -35,10 +36,14 @@ import { useSelector } from 'react-redux';
 
 import { CreateModal } from '../CreateModal';
 
+import { $api } from '../../http';
+
 export const Header = () => {
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 	const [open, setOpen] = React.useState(false);
+	const [searchText, setSearchText] = React.useState('');
+	const [searchedData, setSearchedData] = React.useState([]);
 	const userData = useSelector((state) => state);
 	const createControl = useModal();
 
@@ -102,12 +107,10 @@ export const Header = () => {
 
 	const handleClickOpen = () => {
 		setOpen(true);
-		console.log(open);
 	};
 
 	const handleClose = () => {
 		setOpen(false);
-		console.log(open);
 	};
 
 	const mobileMenuId = 'primary-search-account-menu-mobile';
@@ -162,7 +165,6 @@ export const Header = () => {
 				</Link>
 			</MenuItem>
 
-			<MenuItem style={{ color: 'rgba(0, 0, 0, 0.54)' }}>Like</MenuItem>
 			<MenuItem
 				onClick={handleProfileMenuOpen}
 				style={{ color: 'rgba(0, 0, 0, 0.54)' }}
@@ -181,8 +183,30 @@ export const Header = () => {
 		</Menu>
 	);
 
+	const handleBlur = () => {
+		setTimeout(() => {
+			setSearchText('');
+			handleClose();
+		}, 100);
+	};
+
+	React.useEffect(() => {
+		const handleSearch = async () => {
+			try {
+				const result = await $api.post('/users/search', {
+					searchText: searchText.trim(),
+				});
+				setSearchedData(result.data);
+			} catch (err) {
+				setSearchedData([]);
+			}
+		};
+
+		handleSearch();
+	}, [searchText]);
+
 	return (
-		<>
+		<HeaderSearch>
 			<Box sx={{ flexGrow: 1, paddingTop: '64px' }}>
 				<AppBar sx={{ backgroundColor: '#fff', color: '#000' }}>
 					<Toolbar sx={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
@@ -196,51 +220,42 @@ export const Header = () => {
 								Memory
 							</Typography>
 						</Link>
-						<Search onClick={handleClickOpen}>
+						<Search>
 							<SearchIconWrapper>
 								<SearchIcon />
 							</SearchIconWrapper>
 							<StyledInputBase
 								placeholder='Search'
 								inputProps={{ 'aria-label': 'search' }}
+								onFocus={() => handleClickOpen()}
+								onBlur={() => handleBlur()}
+								onChange={(e) => setSearchText(e.target.value)}
+								value={searchText}
 							/>
 							<Dialog
-								onClose={handleClose}
-								sx={{ display: open ? 'block' : 'none' }}
+								style={{ display: open ? 'block' : 'none' }}
+								className='searchResult'
 							>
 								<List>
-									<ListItem>
-										<ListItemAvatar>
-											<Img src='https://picsum.photos/200/300' />
-										</ListItemAvatar>
-										<ListItemText>
-											<Name>Test Name</Name>
-										</ListItemText>
-									</ListItem>
-									<ListItem>
-										<ListItemAvatar>
-											<Img src='https://picsum.photos/200/300' />
-										</ListItemAvatar>
-										<ListItemText>
-											<Name>Test Name</Name>
-										</ListItemText>
-									</ListItem>
-									<ListItem>
-										<ListItemAvatar>
-											<Img src='https://picsum.photos/200/300' />
-										</ListItemAvatar>
-										<ListItemText>
-											<Name>Test Name</Name>
-										</ListItemText>
-									</ListItem>
-									<ListItem>
-										<ListItemAvatar>
-											<Img src='https://picsum.photos/200/300' />
-										</ListItemAvatar>
-										<ListItemText>
-											<Name>Test Name</Name>
-										</ListItemText>
-									</ListItem>
+									{searchedData?.map((data) => (
+										<Link
+											key={data?._id}
+											to={`/${data?.username}`}
+											style={{ textDecoration: 'none', color: '#000' }}
+										>
+											<ListItem>
+												<ListItemAvatar>
+													<Img src={data?.avatar} />
+												</ListItemAvatar>
+												<ListItemText>
+													<Name>{data?.username}</Name>
+													<Name style={{ color: '#8e8e8e' }}>
+														{data?.fullName}
+													</Name>
+												</ListItemText>
+											</ListItem>
+										</Link>
+									))}
 								</List>
 							</Dialog>
 						</Search>
@@ -278,9 +293,6 @@ export const Header = () => {
 								</IconButton>
 							</Link>
 
-							<IconButton sx={{ color: 'black' }}>
-								<FavoriteBorderRoundedIcon />
-							</IconButton>
 							<IconButton
 								size='large'
 								edge='end'
@@ -318,6 +330,6 @@ export const Header = () => {
 				{renderMenu}
 			</Box>
 			<CreateModal modalControl={createControl} />
-		</>
+		</HeaderSearch>
 	);
 };

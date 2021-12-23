@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
-import BookmarkBorderRoundedIcon from '@mui/icons-material/BookmarkBorderRounded';
+import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
-import SendRoundedIcon from '@mui/icons-material/SendRounded';
-import SentimentSatisfiedRoundedIcon from '@mui/icons-material/SentimentSatisfiedRounded';
 import { $api } from '../../http';
 import { useSelector } from 'react-redux';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import Moment from 'react-moment';
+import { Link } from 'react-router-dom';
+import { useModal } from '../../hooks/useModal';
+import { PostModal } from '../PostModal';
+import { nanoid } from 'nanoid';
 
 import {
 	HomePage,
@@ -18,89 +23,176 @@ import {
 	ImgPost,
 	Icons,
 	AboutPost,
-	Span,
-	CommentBlock,
-	P,
+	SpanTag,
+	PTag,
 	PTime,
 	PLiked,
-	Img,
+	ImgTag,
 	Posts,
 	ProfileInfo,
 	Profile,
 	ProfileAvatar,
 	ProfileText,
 	Name,
-	ProfileLink,
 	RedirectText,
+	PostInstaContainer,
 } from './PostInsta.style';
 
 export const PostInsta = () => {
 	const userData = useSelector((state) => state);
-	const [usersProfile, setUsersProfile] = useState(false);
 	const [posts, setPosts] = useState([]);
-
-	const { username } = useParams();
+	const postControl = useModal();
+	const [postId, setPostId] = useState('');
 
 	const navigate = useNavigate();
 
 	useEffect(async () => {
-		setUsersProfile(username === userData.username);
-		const result = await $api.get(`/posts/you-following/${userData.username}`);
+		const result = await $api.get(`/posts/you-following/${userData?.username}`);
+		console.log(result.data);
 		setPosts(result.data);
 	}, []);
-	console.log(posts);
 
 	const handleRedirect = async () => {
 		navigate(userData.username);
 	};
 
+	const handleLike = async (postId, likeState) => {
+		try {
+			await $api.put(`/posts/${likeState}/${postId}`);
+			const result = await $api.get(
+				`/posts/you-following/${userData?.username}`
+			);
+			setPosts(result.data);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
+	const handleSave = async (postId, saveState) => {
+		try {
+			await $api.put(`/posts/${saveState}/${postId}`);
+			const result = await $api.get(
+				`/posts/you-following/${userData?.username}`
+			);
+			console.log(userData.username);
+			console.log(result.data);
+			setPosts(result.data);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
+	const handleOpenPost = (id) => {
+		setPostId(id);
+		postControl.handleOpenModal();
+	};
+
+	const handleUpdateHover = async () => {
+		try {
+			const result = await $api.get(
+				`/posts/you-following/${userData?.username}`
+			);
+			setPosts(result.data);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
 	return (
-		<HomePage>
-			<Posts>
-				{posts.map((post) => (
-					<PostInstagram>
-						<Card>
-							<Img src='https://picsum.photos/200/300' />
-							<Span>{post.username}</Span>
-						</Card>
-						<Post>
-							<ImgPost src={post?.file?.fileLink} />
-						</Post>
-						<Icons>
-							<LeftIcon>
-								<FavoriteBorderRoundedIcon />
-								<ChatBubbleOutlineRoundedIcon />
-								<SendRoundedIcon />
-							</LeftIcon>
-							<RightIcon>
-								<BookmarkBorderRoundedIcon />
-							</RightIcon>
-						</Icons>
-						<AboutPost>
-							<PLiked>Liked {post.likes.length}</PLiked>
-							<P className='name_caption'>
-								<Span id='caption'>{post.description}</Span>
-								<PTime>30 minutes ago</PTime>
-							</P>
-						</AboutPost>
-						<CommentBlock>
-							<SentimentSatisfiedRoundedIcon />
-							<input type='text' placeholder='add a comment' />
-						</CommentBlock>
-					</PostInstagram>
-				))}
-			</Posts>
-			<ProfileInfo>
-				<Profile>
-					<ProfileAvatar>
-						<Img src='https://picsum.photos/200/300' />
-					</ProfileAvatar>
-					<ProfileText onClick={() => handleRedirect()}>
-						<Name>{userData.username}</Name>
-					</ProfileText>
-					<RedirectText onClick={() => handleRedirect()}>Profile</RedirectText>
-				</Profile>
-			</ProfileInfo>
-		</HomePage>
+		<PostInstaContainer>
+			<HomePage>
+				<Posts>
+					{posts.map((post) => (
+						<PostInstagram key={nanoid()}>
+							<Card>
+								<Link to={`/${post?.username}`}>
+									<ImgTag src={post?.avatar} />
+								</Link>
+								<Link
+									to={`/${post?.username}`}
+									style={{ textDecoration: 'none', color: '#000' }}
+								>
+									<SpanTag>{post?.username}</SpanTag>
+								</Link>
+							</Card>
+							<Post>
+								<ImgPost src={post?.file?.fileLink} />
+							</Post>
+							<Icons>
+								<LeftIcon>
+									{post?.likes.some((like) => like.user === userData._id) ? (
+										<FavoriteRoundedIcon
+											onClick={() => handleLike(post?._id, 'unlike')}
+											style={{ color: '#ED4956' }}
+										/>
+									) : (
+										<FavoriteBorderRoundedIcon
+											onClick={() => handleLike(post?._id, 'like')}
+										/>
+									)}
+								</LeftIcon>
+								<LeftIcon>
+									<ChatBubbleOutlineRoundedIcon
+										onClick={() => handleOpenPost(post?._id)}
+									/>
+								</LeftIcon>
+								<RightIcon>
+									{post?.saved.some((save) => save.user === userData._id) ? (
+										<BookmarkIcon
+											onClick={() => handleSave(post._id, 'unsave')}
+										/>
+									) : (
+										<BookmarkBorderIcon
+											onClick={() => handleSave(post._id, 'save')}
+										/>
+									)}
+								</RightIcon>
+							</Icons>
+							<AboutPost>
+								<PLiked>Liked {post?.likes.length}</PLiked>
+								<PTag className='name_caption'>
+									<SpanTag id='caption'>{post?.description}</SpanTag>
+									<PTime>
+										<Moment fromNow>{new Date(post?.date)}</Moment>
+									</PTime>
+								</PTag>
+							</AboutPost>
+						</PostInstagram>
+					))}
+				</Posts>
+				<ProfileInfo>
+					<Profile>
+						<Link to={`/${userData?.username}`}>
+							<ProfileAvatar>
+								<ImgTag src={userData?.avatar} />
+							</ProfileAvatar>
+						</Link>
+
+						<ProfileText>
+							<Link
+								to={`/${userData?.username}`}
+								style={{
+									textDecoration: 'none',
+									color: '#000',
+								}}
+							>
+								<Name>{userData?.username}</Name>
+							</Link>
+							<Name style={{ color: '#8e8e8e' }}>{userData?.fullName}</Name>
+						</ProfileText>
+
+						<RedirectText onClick={() => handleRedirect()}>
+							Profile
+						</RedirectText>
+					</Profile>
+				</ProfileInfo>
+			</HomePage>
+
+			<PostModal
+				handleUpdateHover={handleUpdateHover}
+				modalControl={postControl}
+				postId={postId}
+			/>
+		</PostInstaContainer>
 	);
 };

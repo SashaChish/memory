@@ -3,6 +3,17 @@ import InputBase from '@mui/material/InputBase';
 import { styled, alpha } from '@mui/material/styles';
 import styledC from 'styled-components';
 
+export const HeaderSearch = styledC.div`
+	.searchResult {
+		overflow-y: scroll;
+		max-height: 360px;
+
+		&::-webkit-scrollbar{
+			display:none;
+		}
+	}
+`;
+
 export const Search = styled('div')(({ theme }) => ({
 	border: 'solid 1px #dbdbdb',
 	position: 'relative',
@@ -44,12 +55,18 @@ export const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export const ListItem = styledC.div`
 	display: flex;
 	align-items: center;
+	padding:15px 10px;
+
+	&:hover{
+		background-color:#EFEFEF;
+	}
 `;
-export const List = styledC.div``;
+export const List = styledC.div`
+	margin:-5px 0;
+`;
 export const Dialog = styledC.div`
 	position: absolute;
 	background: #fff;
-    padding: 10px;
     width: 100%;
     -webkit-box-shadow: 0px 0px 8px 0px rgb(34 60 80 / 20%);
     -moz-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
@@ -64,4 +81,8 @@ export const Img = styledC.img`
 	height: 40px;
 	margin-right: 10px;
 `;
-export const ListItemText = styledC.div``;
+export const ListItemText = styledC.div`
+	display:flex;
+	flex-direction:column;
+	overflow-x:hidden;
+`;
