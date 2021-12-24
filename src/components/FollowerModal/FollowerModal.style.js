@@ -7,8 +7,10 @@ export const Row = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 5px 0;
+	padding: 10px 0;
 	border-bottom: 1px solid ${color5};
+	margin-top: -10px;
+	font-weight: 500;
 
 	button {
 		text-transform: capitalize;
@@ -40,14 +42,17 @@ export const ProfileInfo = styled.div`
 export const Profile = styled.div`
 	display: flex;
 	align-items: center;
+	padding: 15px 0px 0;
 `;
 export const ProfileAvatar = styled.div``;
-export const ProfileText = styled.div``;
+export const ProfileText = styled.div`
+	width: -webkit-fill-available;
+`;
 export const Name = styled.div``;
 
 export const Cansel = styled.span`
 	cursor: pointer;
 	color: #0095f6;
-	margin-left: 150px;
+	margin-right: 10px;
 `;
 export const Link = styled.a``;

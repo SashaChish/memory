@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import {
 	ImgTag,
@@ -12,42 +12,75 @@ import {
 	Row,
 } from './FollowerModal.style';
 
-export const FollowerModal = ({ modalControl }) => {
+import { $api } from '../../http';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/User/userActions';
+
+export const FollowerModal = ({ refreshData, modalControl }) => {
+	const [followers, setFollowers] = useState([]);
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await $api.get('/profile/followers');
+			setFollowers(result.data);
+		};
+
+		fetchData();
+	}, []);
+
+	const handleRemove = async (id) => {
+		try {
+			await $api.post('/profile/follower/remove', {
+				id: id,
+			});
+			const result = await $api.get('/profile/following');
+			setFollowers(result.data);
+			const userInfo = await $api.get('/auth');
+			dispatch(setUser(userInfo.data));
+			refreshData();
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
 	return (
 		<>
 			<Row>
-				<Button variant='text' color='inherit' fullWidth>
-					Followers
-				</Button>
-				<CloseIcon></CloseIcon>
+				Followers
+				<CloseIcon
+					style={{
+						position: 'absolute',
+						top: '10px',
+						right: '15px',
+						cursor: 'pointer',
+					}}
+					onClick={() => modalControl.handleCloseModal()}
+				></CloseIcon>
 			</Row>
 
 			<FollowerInfo>
-				<Profile>
-					<ProfileAvatar>
-						<ImgTag src='https://i.picsum.photos/id/0/5616/3744.jpg?hmac=3GAAioiQziMGEtLbfrdbcoenXoWAW-zlyEAMkfEdBzQ' />
-					</ProfileAvatar>
-					<ProfileText>
-						<Link
-							style={{
-								textDecoration: 'none',
-								color: '#000',
-							}}
-						>
-							<Name>Oleksandra</Name>
-						</Link>
-						<Name style={{ color: '#8e8e8e' }}>Kot</Name>
-					</ProfileText>
+				{followers.map((follow) => (
+					<Profile>
+						<ProfileAvatar>
+							<ImgTag src={follow?.avatar} />
+						</ProfileAvatar>
+						<ProfileText>
+							<Link
+								style={{
+									textDecoration: 'none',
+									color: '#000',
+								}}
+							>
+								<Name>{follow?.username}</Name>
+							</Link>
+							<Name style={{ color: '#8e8e8e' }}>{follow?.fullName}</Name>
+						</ProfileText>
 
-					<Cansel>Remove</Cansel>
-				</Profile>
+						<Cansel onClick={() => handleRemove(follow?.user)}>Remove</Cansel>
+					</Profile>
+				))}
 			</FollowerInfo>
-			<Button
-				onClick={modalControl.handleCloseModal}
-				variant='text'
-				color='inherit'
-				fullWidth
-			></Button>
 		</>
 	);
 };
