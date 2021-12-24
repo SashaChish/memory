@@ -190,6 +190,10 @@ export const UserPage = () => {
 											username === userData?.username &&
 											followers.handleOpenModal
 										}
+										style={{
+											cursor:
+												username === userData?.username ? 'pointer' : 'none',
+										}}
 									>
 										{profileInfo?.followers?.length} followers
 									</span>
@@ -206,6 +210,12 @@ export const UserPage = () => {
 											username === userData?.username &&
 											followingModal.handleOpenModal
 										}
+										style={{
+											cursor:
+												username === userData?.username
+													? 'pointer'
+													: 'progress',
+										}}
 									>
 										{profileInfo?.following?.length} following
 									</span>
