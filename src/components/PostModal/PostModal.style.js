@@ -63,6 +63,17 @@ export const PostImg = styled.img`
 	}
 `;
 
+export const PostVideo = styled.video`
+	width: 60%;
+	object-fit: contain;
+	background: #000;
+
+	@media (max-width: 426px) {
+		width: 100%;
+		height: 85vh;
+	}
+`;
+
 export const PostUsername = styled.span`
 	font-weight: 600;
 	font-size: 17px;

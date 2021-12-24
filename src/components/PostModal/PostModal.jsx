@@ -34,6 +34,7 @@ import {
 	CommentForm,
 	PostIcon,
 	PostSaved,
+	PostVideo,
 } from './PostModal.style';
 
 import { $api } from '../../http';
@@ -161,10 +162,16 @@ export const PostModal = ({ handleUpdateHover, modalControl, postId }) => {
 				open={modalControl.open}
 				className='postModalDialog'
 			>
-				<PostImg
-					src={postInfo?.file?.fileLink}
-					alt={`${postInfo?.username}'s picture`}
-				/>
+				{postInfo?.file?.fileType === 'mp4' ? (
+					<PostVideo controls>
+						<source src={postInfo?.file?.fileLink} type='video/mp4'></source>
+					</PostVideo>
+				) : (
+					<PostImg
+						src={postInfo?.file?.fileLink}
+						alt={`${postInfo?.username}'s picture`}
+					/>
+				)}
 
 				<DialogInfo>
 					<BootstrapDialogTitle

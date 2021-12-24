@@ -36,6 +36,7 @@ import {
 	Name,
 	RedirectText,
 	PostInstaContainer,
+	VideoPost,
 } from './PostInsta.style';
 
 export const PostInsta = () => {
@@ -116,7 +117,16 @@ export const PostInsta = () => {
 								</Link>
 							</Card>
 							<Post>
-								<ImgPost src={post?.file?.fileLink} />
+								{post?.file?.fileType === 'mp4' ? (
+									<VideoPost controls>
+										<source
+											src={post?.file?.fileLink}
+											type='video/mp4'
+										></source>
+									</VideoPost>
+								) : (
+									<ImgPost src={post?.file?.fileLink} />
+								)}
 							</Post>
 							<Icons>
 								<LeftIcon>
