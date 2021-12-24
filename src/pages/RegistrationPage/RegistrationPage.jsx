@@ -75,10 +75,11 @@ export const RegistrationPage = () => {
 
 			localStorage.setItem('x-auth-token', res.data.token);
 
-			const userData = await userInfo();
-			dispatch(setUser(userData.data));
-
-			navigate(`/${username.value}`);
+			setTimeout(async () => {
+				const userData = await userInfo();
+				dispatch(setUser(userData.data));
+				navigate(`/${username.value}`);
+			}, 100);
 		} catch (e) {
 			console.log(e);
 			if (e.toJSON().status === 409) {

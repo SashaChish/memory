@@ -27,7 +27,7 @@ router.post(
 			const newPost = new Post({
 				user: req.user.id,
 				description: req.body.description,
-				picture: req.body.picture,
+				file: req.body.file,
 				username: user.username,
 				avatar: user.avatar,
 			});
@@ -308,6 +308,59 @@ router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
 		await post.save();
 
 		res.json(post.comments);
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).send('Server Error!');
+	}
+});
+
+//@route	GET api/posts/you-following/:username
+//@desc		Return posts of users that you follow, sorted by date
+//@access	Private
+router.get('/you-following/:username', auth, async (req, res) => {
+	try {
+		const profile = await Profile.findOne({ username: req.params.username });
+		let postsIds = await Promise.all(
+			profile.following.map(async (follow) => {
+				const followProfile = await Profile.findOne({ user: follow.user });
+				return followProfile !== null ? followProfile.posts : followProfile;
+			})
+		);
+
+		//removing unvalid ids
+		postsIds = postsIds.filter((elem) => elem != null);
+
+		//adding my own posts
+		postsIds.push(profile.posts);
+
+		postsIds =
+			postsIds.length > 0 && postsIds.reduce((prev, next) => prev.concat(next));
+
+		let posts =
+			postsIds.length > 0
+				? await Promise.all(
+						postsIds.map(
+							async (postId) => await Post.findById(postId.post).lean()
+						)
+				  )
+				: [];
+
+		//removing unvalid posts
+		posts = posts.filter((elem) => elem != null);
+
+		//removing duplicates
+		for (let i = 0; i < posts.length - 1; i++) {
+			for (let j = i + 1; j < posts.length; j++) {
+				if (posts[i]._id == posts[j]._id) {
+					posts.splice(j, 1);
+				}
+			}
+		}
+
+		//sorting by dates
+		posts = posts.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+
+		res.json(posts);
 	} catch (err) {
 		console.error(err.message);
 		res.status(500).send('Server Error!');

@@ -12,18 +12,40 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import MoreIcon from '@mui/icons-material/MoreVert';
-import { Search, SearchIconWrapper, StyledInputBase } from './Header.style';
+import {
+	Search,
+	SearchIconWrapper,
+	StyledInputBase,
+	ListItemText,
+	ListItem,
+	List,
+	Dialog,
+	ListItemAvatar,
+	Name,
+	Img,
+	HeaderSearch,
+} from './Header.style';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
+
+import { useModal } from '../../hooks/useModal';
 
 import { Link } from 'react-router-dom';
 
 import { useSelector } from 'react-redux';
 
+import { CreateModal } from '../CreateModal';
+
+import { $api } from '../../http';
+
 export const Header = () => {
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+	const [open, setOpen] = React.useState(false);
+	const [searchText, setSearchText] = React.useState('');
+	const [searchedData, setSearchedData] = React.useState([]);
 	const userData = useSelector((state) => state);
+	const createControl = useModal();
 
 	const isMenuOpen = Boolean(anchorEl);
 	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -83,6 +105,14 @@ export const Header = () => {
 		</Menu>
 	);
 
+	const handleClickOpen = () => {
+		setOpen(true);
+	};
+
+	const handleClose = () => {
+		setOpen(false);
+	};
+
 	const mobileMenuId = 'primary-search-account-menu-mobile';
 	const renderMobileMenu = (
 		<Menu
@@ -115,7 +145,12 @@ export const Header = () => {
 				</Link>
 			</MenuItem>
 
-			<MenuItem style={{ color: 'rgba(0, 0, 0, 0.54)' }}>Add Photo</MenuItem>
+			<MenuItem
+				style={{ color: 'rgba(0, 0, 0, 0.54)' }}
+				onClick={() => createControl.handleOpenModal()}
+			>
+				Add Photo
+			</MenuItem>
 			<MenuItem>
 				<Link
 					to='/explore'
@@ -130,7 +165,6 @@ export const Header = () => {
 				</Link>
 			</MenuItem>
 
-			<MenuItem style={{ color: 'rgba(0, 0, 0, 0.54)' }}>Like</MenuItem>
 			<MenuItem
 				onClick={handleProfileMenuOpen}
 				style={{ color: 'rgba(0, 0, 0, 0.54)' }}
@@ -149,98 +183,153 @@ export const Header = () => {
 		</Menu>
 	);
 
+	const handleBlur = () => {
+		setTimeout(() => {
+			setSearchText('');
+			handleClose();
+		}, 100);
+	};
+
+	React.useEffect(() => {
+		const handleSearch = async () => {
+			try {
+				const result = await $api.post('/users/search', {
+					searchText: searchText.trim(),
+				});
+				setSearchedData(result.data);
+			} catch (err) {
+				setSearchedData([]);
+			}
+		};
+
+		handleSearch();
+	}, [searchText]);
+
 	return (
-		<Box sx={{ flexGrow: 1, paddingTop: '64px' }}>
-			<AppBar sx={{ backgroundColor: '#fff', color: '#000' }}>
-				<Toolbar sx={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-					<Link to='/' style={{ textDecoration: 'none' }}>
-						<Typography
-							variant='h6'
-							noWrap
-							component='div'
-							sx={{ display: { xs: 'none', sm: 'block' }, color: 'black' }}
-						>
-							Memory
-						</Typography>
-					</Link>
-					<Search>
-						<SearchIconWrapper>
-							<SearchIcon />
-						</SearchIconWrapper>
-						<StyledInputBase
-							placeholder='Search'
-							inputProps={{ 'aria-label': 'search' }}
-						/>
-					</Search>
-					<Box sx={{ flexGrow: 1 }} />
-					<Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-						<Link
-							to='/'
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								textDecoration: 'none',
-							}}
-						>
-							<IconButton sx={{ color: 'black' }}>
-								<HomeOutlinedIcon />
-							</IconButton>
+		<HeaderSearch>
+			<Box sx={{ flexGrow: 1, paddingTop: '64px' }}>
+				<AppBar sx={{ backgroundColor: '#fff', color: '#000' }}>
+					<Toolbar sx={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+						<Link to='/' style={{ textDecoration: 'none' }}>
+							<Typography
+								variant='h6'
+								noWrap
+								component='div'
+								sx={{ display: { xs: 'none', sm: 'block' }, color: 'black' }}
+							>
+								Memory
+							</Typography>
 						</Link>
+						<Search>
+							<SearchIconWrapper>
+								<SearchIcon />
+							</SearchIconWrapper>
+							<StyledInputBase
+								placeholder='Search'
+								inputProps={{ 'aria-label': 'search' }}
+								onFocus={() => handleClickOpen()}
+								onBlur={() => handleBlur()}
+								onChange={(e) => setSearchText(e.target.value)}
+								value={searchText}
+							/>
+							<Dialog
+								style={{ display: open ? 'block' : 'none' }}
+								className='searchResult'
+							>
+								<List>
+									{searchedData?.map((data) => (
+										<Link
+											key={data?._id}
+											to={`/${data?.username}`}
+											style={{ textDecoration: 'none', color: '#000' }}
+										>
+											<ListItem>
+												<ListItemAvatar>
+													<Img src={data?.avatar} />
+												</ListItemAvatar>
+												<ListItemText>
+													<Name>{data?.username}</Name>
+													<Name style={{ color: '#8e8e8e' }}>
+														{data?.fullName}
+													</Name>
+												</ListItemText>
+											</ListItem>
+										</Link>
+									))}
+								</List>
+							</Dialog>
+						</Search>
+						<Box sx={{ flexGrow: 1 }} />
+						<Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+							<Link
+								to='/'
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									textDecoration: 'none',
+								}}
+							>
+								<IconButton sx={{ color: 'black' }}>
+									<HomeOutlinedIcon />
+								</IconButton>
+							</Link>
 
-						<IconButton sx={{ color: 'black' }}>
-							<AddBoxOutlinedIcon />
-						</IconButton>
-						<Link
-							to='/explore'
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								textDecoration: 'none',
-							}}
-						>
-							<IconButton sx={{ color: 'black' }}>
-								<ExploreOutlinedIcon />
+							<IconButton
+								sx={{ color: 'black' }}
+								onClick={() => createControl.handleOpenModal()}
+							>
+								<AddBoxOutlinedIcon />
 							</IconButton>
-						</Link>
+							<Link
+								to='/explore'
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									textDecoration: 'none',
+								}}
+							>
+								<IconButton sx={{ color: 'black' }}>
+									<ExploreOutlinedIcon />
+								</IconButton>
+							</Link>
 
-						<IconButton sx={{ color: 'black' }}>
-							<FavoriteBorderRoundedIcon />
-						</IconButton>
-						<IconButton
-							size='large'
-							edge='end'
-							aria-label='account of current user'
-							aria-controls={menuId}
-							aria-haspopup='true'
-							onClick={handleProfileMenuOpen}
-							sx={{ color: 'black' }}
-						>
-							{userData?.avatar ? (
-								<Avatar
-									sx={{ width: 24, height: 24 }}
-									alt={userData?.username}
-									src={userData?.avatar}
-								/>
-							) : (
-								<AccountCircle />
-							)}
-						</IconButton>
-					</Box>
-					<Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-						<IconButton
-							size='large'
-							aria-label='show more'
-							aria-controls={mobileMenuId}
-							aria-haspopup='true'
-							onClick={handleMobileMenuOpen}
-						>
-							<MoreIcon />
-						</IconButton>
-					</Box>
-				</Toolbar>
-			</AppBar>
-			{renderMobileMenu}
-			{renderMenu}
-		</Box>
+							<IconButton
+								size='large'
+								edge='end'
+								aria-label='account of current user'
+								aria-controls={menuId}
+								aria-haspopup='true'
+								onClick={handleProfileMenuOpen}
+								sx={{ color: 'black' }}
+							>
+								{userData?.avatar ? (
+									<Avatar
+										sx={{ width: 24, height: 24 }}
+										alt={userData?.username}
+										src={userData?.avatar}
+									/>
+								) : (
+									<AccountCircle />
+								)}
+							</IconButton>
+						</Box>
+						<Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+							<IconButton
+								size='large'
+								aria-label='show more'
+								aria-controls={mobileMenuId}
+								aria-haspopup='true'
+								onClick={handleMobileMenuOpen}
+							>
+								<MoreIcon />
+							</IconButton>
+						</Box>
+					</Toolbar>
+				</AppBar>
+				{renderMobileMenu}
+				{renderMenu}
+			</Box>
+			<CreateModal modalControl={createControl} />
+		</HeaderSearch>
 	);
 };

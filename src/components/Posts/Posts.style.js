@@ -11,11 +11,21 @@ export const PostsContainer = styled.div`
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 30px;
+	grid-auto-rows: 1fr;
 
 	img {
 		max-width: 100%;
 		height: 100%;
 		object-fit: cover;
+	}
+
+	video {
+		max-height: 230px;
+		margin: 0 auto;
+
+		@media (max-width: 768px) {
+			max-height: 170px;
+		}
 	}
 
 	@media (max-width: 426px) {
@@ -34,6 +44,7 @@ export const PostLinks = styled.div`
 	transition: 0.2s;
 	color: ${color2};
 	display: flex;
+	z-index: 2;
 
 	span {
 		display: flex;
@@ -52,6 +63,8 @@ export const PostLinks = styled.div`
 export const PostItem = styled.div`
 	position: relative;
 	cursor: pointer;
+	background: #000;
+	display: flex;
 
 	&:before {
 		content: '';
@@ -61,6 +74,7 @@ export const PostItem = styled.div`
 		left: 0;
 		width: 100%;
 		height: 100%;
+		z-index: 1;
 		background-color: rgba(0, 0, 0, 0);
 	}
 
