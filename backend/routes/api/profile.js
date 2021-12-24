@@ -7,6 +7,60 @@ const Profile = require('../../models/Profile.js');
 const User = require('../../models/User.js');
 const Post = require('../../models/Post.js');
 
+//@route    GET api/profile/following
+//@desc     Get all following users info
+//@access   Private
+router.get('/following', auth, async (req, res) => {
+	try {
+		const profile = await Profile.findOne({ user: req.user.id });
+
+		const result = await Promise.all(
+			profile.following.map(async (elem) => {
+				const user = await User.findById(elem.user.toString());
+
+				return {
+					user: elem.user.toString(),
+					avatar: user.avatar,
+					username: user.username,
+					fullName: user.fullName,
+				};
+			})
+		);
+
+		res.json(result);
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).send('Server Error!');
+	}
+});
+
+//@route    GET api/profile/followers
+//@desc     Get all followers info
+//@access   Private
+router.get('/followers', auth, async (req, res) => {
+	try {
+		const profile = await Profile.findOne({ user: req.user.id });
+
+		const result = await Promise.all(
+			profile.followers.map(async (follower) => {
+				const user = await User.findById(follower.user.toString());
+
+				return {
+					user: follower.user.toString(),
+					avatar: user.avatar,
+					username: user.username,
+					fullName: user.fullName,
+				};
+			})
+		);
+
+		res.json(result);
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).send('Server Error!');
+	}
+});
+
 //@route    GET api/profile/:username
 //@desc     Get profiles info
 //@access   Private
@@ -110,33 +164,6 @@ router.post(
 	}
 );
 
-//@route    GET api/profile/followers
-//@desc     Get all followers info
-//@access   Private
-router.get('/followers', auth, async (req, res) => {
-	try {
-		const profile = await Profile.findOne({ user: req.user.id });
-
-		const result = await Promise.all(
-			profile.followers.map(async (follower) => {
-				const user = await User.findById(follower.user.toString());
-
-				return {
-					user: follower.user.toString(),
-					avatar: user.avatar,
-					username: user.username,
-					fullName: user.fullName,
-				};
-			})
-		);
-
-		res.json(result);
-	} catch (err) {
-		console.error(err.message);
-		res.status(500).send('Server Error!');
-	}
-});
-
 //@route    POST api/profile/follower/remove
 //@desc     Remove follower
 //@access   Private
@@ -171,33 +198,6 @@ router.post('/follower/remove', auth, async (req, res) => {
 		if (err.kind === 'ObjectId') {
 			return res.status(404).send('User not found!');
 		}
-		res.status(500).send('Server Error!');
-	}
-});
-
-//@route    GET api/profile/following
-//@desc     Get all following users info
-//@access   Private
-router.get('/following', auth, async (req, res) => {
-	try {
-		const profile = await Profile.findOne({ user: req.user.id });
-
-		const result = await Promise.all(
-			profile.following.map(async (elem) => {
-				const user = await User.findById(elem.user.toString());
-
-				return {
-					user: elem.user.toString(),
-					avatar: user.avatar,
-					username: user.username,
-					fullName: user.fullName,
-				};
-			})
-		);
-
-		res.json(result);
-	} catch (err) {
-		console.error(err.message);
 		res.status(500).send('Server Error!');
 	}
 });

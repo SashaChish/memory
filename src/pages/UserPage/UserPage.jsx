@@ -18,7 +18,6 @@ import { Posts } from '../../components/Posts';
 import { Modal } from '../../components/Modal';
 import { NotFoundPage } from '../NotFoundPage';
 import { AvatarModal } from '../../components/AvatarModal';
-import { SettingsModal } from '../../components/SettingsModal';
 import { FollowerModal } from '../../components/FollowerModal';
 import { FollowingModal } from '../../components/FollowingModal';
 
@@ -51,9 +50,8 @@ import {
 
 export const UserPage = () => {
 	const avatar = useModal();
-	const settings = useModal();
 	const followers = useModal();
-	const following = useModal();
+	const followingModal = useModal();
 	const { username } = useParams();
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -73,15 +71,8 @@ export const UserPage = () => {
 			try {
 				const profile = await $api.get(`/profile/${username}`);
 				setProfileInfo(profile.data);
-				console.log(userData);
 				userData?.following.map((follow) => console.log(follow.user));
-				console.log(profile.data?.user);
 				setFollowing(
-					userData?.following.some(
-						(follow) => follow.user === profile.data?.user
-					)
-				);
-				console.log(
 					userData?.following.some(
 						(follow) => follow.user === profile.data?.user
 					)
@@ -146,6 +137,11 @@ export const UserPage = () => {
 		}
 	};
 
+	const refreshData = async () => {
+		const profile = await $api.get(`/profile/${username}`);
+		setProfileInfo(profile.data);
+	};
+
 	return !notFoundError ? (
 		<PageWrapper>
 			<Main>
@@ -189,19 +185,35 @@ export const UserPage = () => {
 									<span>{profileInfo?.posts?.length} posts</span>
 								</li>
 								<li>
-									<span onClick={followers.handleOpenModal}>
+									<span
+										onClick={
+											username === userData?.username &&
+											followers.handleOpenModal
+										}
+									>
 										{profileInfo?.followers?.length} followers
 									</span>
 									<Modal modalControl={followers}>
-										<FollowerModal modalControl={followers} />
+										<FollowerModal
+											refreshData={refreshData}
+											modalControl={followers}
+										/>
 									</Modal>
 								</li>
 								<li>
-									<span onClick={following.handleOpenModal}>
+									<span
+										onClick={
+											username === userData?.username &&
+											followingModal.handleOpenModal
+										}
+									>
 										{profileInfo?.following?.length} following
 									</span>
-									<Modal modalControl={following}>
-										<FollowingModal modalControl={following} />
+									<Modal modalControl={followingModal}>
+										<FollowingModal
+											refreshData={refreshData}
+											modalControl={followingModal}
+										/>
 									</Modal>
 								</li>
 							</ul>
