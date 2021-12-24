@@ -18,6 +18,9 @@ import { Posts } from '../../components/Posts';
 import { Modal } from '../../components/Modal';
 import { NotFoundPage } from '../NotFoundPage';
 import { AvatarModal } from '../../components/AvatarModal';
+import { SettingsModal } from '../../components/SettingsModal';
+import { FollowerModal } from '../../components/FollowerModal';
+import { FollowingModal } from '../../components/FollowingModal';
 
 import { transformError } from '../../helpers';
 
@@ -48,6 +51,9 @@ import {
 
 export const UserPage = () => {
 	const avatar = useModal();
+	const settings = useModal();
+	const followers = useModal();
+	const following = useModal();
 	const { username } = useParams();
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -183,10 +189,20 @@ export const UserPage = () => {
 									<span>{profileInfo?.posts?.length} posts</span>
 								</li>
 								<li>
-									<span>{profileInfo?.followers?.length} followers</span>
+									<span onClick={followers.handleOpenModal}>
+										{profileInfo?.followers?.length} followers
+									</span>
+									<Modal modalControl={followers}>
+										<FollowerModal modalControl={followers} />
+									</Modal>
 								</li>
 								<li>
-									<span>{profileInfo?.following?.length} following</span>
+									<span onClick={following.handleOpenModal}>
+										{profileInfo?.following?.length} following
+									</span>
+									<Modal modalControl={following}>
+										<FollowingModal modalControl={following} />
+									</Modal>
 								</li>
 							</ul>
 							<FullNameBlock>
