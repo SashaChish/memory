@@ -26,8 +26,6 @@ import { transformError } from '../../helpers';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../redux/User/userActions';
 
-import { transformError } from '../../helpers';
-
 import {
 	Main,
 	PageWrapper,
