@@ -163,7 +163,21 @@ export const BtnWrapper = styled.div`
 	}
 `;
 
-export const BtnEdit = styled.a`
+export const BtnFollow = styled.a`
+	background: #0095f6;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	display: block;
+	font-weight: 600;
+	letter-spacing: 1px;
+	padding: 7px 30px;
+	text-align: center;
+	transition: all 0.3s ease-in-out 0s;
+	color: white;
+`;
+
+export const BtnUnfollow = styled.a`
 	background: ${color2};
 	border: 1px solid ${color5};
 	border-radius: 4px;

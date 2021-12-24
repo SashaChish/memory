@@ -137,43 +137,33 @@ router.get('/followers', auth, async (req, res) => {
 	}
 });
 
-//@route    POST api/profile/follower/add
-//@desc     Adds follower
-//@access   Private
-router.post('/follower/add', auth, async (req, res) => {
-	try {
-		const profile = await Profile.findOne({ user: req.user.id });
-		profile.followers.unshift({ user: req.body.id });
-
-		await profile.save();
-
-		res.json(profile);
-	} catch (err) {
-		console.error(err.message);
-		if (err.kind === 'ObjectId') {
-			return res.status(404).send('User not found!');
-		}
-		res.status(500).send('Server Error!');
-	}
-});
-
 //@route    POST api/profile/follower/remove
 //@desc     Remove follower
 //@access   Private
 router.post('/follower/remove', auth, async (req, res) => {
 	try {
 		const profile = await Profile.findOne({ user: req.user.id });
+		const followerProfile = await Profile.findOne({ user: req.body.id });
 		const removeIndex = profile.followers
 			.map((follower) => follower.user.toString())
 			.indexOf(req.body.id);
+		const followerIndex = followerProfile.following
+			.map((follow) => follow.user.toString())
+			.indexOf(req.user.id);
+
+		if (removeIndex === -1) {
+			return res.status(404).send('User not found!');
+		}
 
 		if (removeIndex === -1) {
 			return res.status(404).send('User not found!');
 		}
 
 		profile.followers.splice(removeIndex, 1);
+		followerProfile.following.splice(followerIndex, 1);
 
 		await profile.save();
+		await followerProfile.save();
 
 		res.json(profile);
 	} catch (err) {
@@ -218,9 +208,12 @@ router.get('/following', auth, async (req, res) => {
 router.post('/following/add', auth, async (req, res) => {
 	try {
 		const profile = await Profile.findOne({ user: req.user.id });
+		const followingProfile = await Profile.findOne({ user: req.body.id });
 		profile.following.unshift({ user: req.body.id });
+		followingProfile.followers.unshift({ user: req.user.id });
 
 		await profile.save();
+		await followingProfile.save();
 
 		res.json(profile);
 	} catch (err) {
@@ -238,17 +231,27 @@ router.post('/following/add', auth, async (req, res) => {
 router.post('/following/remove', auth, async (req, res) => {
 	try {
 		const profile = await Profile.findOne({ user: req.user.id });
+		const followingProfile = await Profile.findOne({ user: req.body.id });
 		const removeIndex = profile.following
 			.map((elem) => elem.user.toString())
 			.indexOf(req.body.id);
+		const followerIndex = followingProfile.followers
+			.map((elem) => elem.user.toString())
+			.indexOf(req.user.id);
 
 		if (removeIndex === -1) {
 			return res.status(404).send('User not found!');
 		}
 
+		if (followerIndex === -1) {
+			return res.status(404).send('User not found!');
+		}
+
 		profile.following.splice(removeIndex, 1);
+		followingProfile.followers.splice(followerIndex, 1);
 
 		await profile.save();
+		await followingProfile.save();
 
 		res.json(profile);
 	} catch (err) {
