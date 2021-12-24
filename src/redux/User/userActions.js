@@ -6,7 +6,6 @@ export const setUser = (userData) => {
 		payload: userData,
 	};
 };
-
 export const setAvatar = (link) => {
 	return {
 		type: SET_AVATAR,

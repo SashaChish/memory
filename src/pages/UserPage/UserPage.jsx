@@ -26,6 +26,8 @@ import { transformError } from '../../helpers';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../redux/User/userActions';
 
+import { transformError } from '../../helpers';
+
 import {
 	Main,
 	PageWrapper,
@@ -86,7 +88,6 @@ export const UserPage = () => {
 
 			const posts = await $api.get(`/profile/posts/${username}`);
 			const saved = await $api.get(`/profile/saved/me`);
-
 			posts.status === 200 && setProfilePosts(posts.data);
 			saved.status === 200 &&
 				username === userData.username &&
