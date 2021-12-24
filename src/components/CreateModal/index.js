@@ -1,1 +1,1 @@
-export { CreateModal } from './CreateModal.js';
+export { CreateModal } from './CreateModal.jsx';

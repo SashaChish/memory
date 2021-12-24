@@ -65,6 +65,12 @@ export const ImgPost = styled.img`
 	display: block;
 	width: 100%;
 `;
+export const VideoPost = styled.video`
+	width: 100%;
+	height: 100%;
+	max-height: 600px;
+	background: #000;
+`;
 export const PLiked = styled.p`
 	font-weight: 600;
 `;

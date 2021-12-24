@@ -7,6 +7,7 @@ import {
 } from './Posts.style';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 
 import { useModal } from '../../hooks/useModal';
 
@@ -27,11 +28,23 @@ export const Posts = ({ handleUpdateHover, type, files }) => {
 				<PostsContainer>
 					{files.map((file) => (
 						<PostItem key={file._id} onClick={() => handleOpenPost(file._id)}>
-							{/* {file?.file?.fileType === 'png' ? ( */}
-							<img src={file?.file?.fileLink} alt={type} />
-							{/* ) : (
-								<video src={file?.file?.fileLink}></video>
-							)} */}
+							{file?.file?.fileType === 'png' ? (
+								<img src={file?.file?.fileLink} alt={type} />
+							) : (
+								<>
+									<video src={file?.file?.fileLink}></video>
+									<PlayArrowRoundedIcon
+										style={{
+											position: 'absolute',
+											top: '5px',
+											right: '5px',
+											color: 'white',
+											fontSize: '40px',
+											zIndex: '0',
+										}}
+									/>
+								</>
+							)}
 							<PostLinks>
 								<span>
 									<FavoriteIcon /> {file.likes}

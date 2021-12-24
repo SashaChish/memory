@@ -78,6 +78,12 @@ export const Image = styled.img`
 	height: 100%;
 `;
 
+export const Video = styled.video`
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+`;
+
 export const Info = styled.div`
 	display: none;
 	justify-content: center;
